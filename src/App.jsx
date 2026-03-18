@@ -1,14 +1,18 @@
-import { BrowserRouter as Router, Routes, Route, useLocation} from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import Home from "./pages/Landing";
 import SingleService from "./pages/SingleService";
 import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
-import Navbar from "./Components/Navbar";
 import Services from "./pages/Services";
 import SingleProject from "./pages/SingleProject";
 import Careers from "./pages/Careers";
 import Loader from "./components/Loader.jsx";
-
+import Navbar from "./components/Navbar";
 
 function App() {
   const location = useLocation();

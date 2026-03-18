@@ -12,7 +12,7 @@ const Navbar = () => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDesktopServicesOpen(false);
-      }
+      } 
     };
 
     if (desktopServicesOpen) {
