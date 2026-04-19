@@ -59,8 +59,8 @@ export default function SingleProject() {
           <motion.img
             src={project.mainImage || project.img}
             alt={project.title}
-            className="w-full h-[500px] object-contain shadow-2xl md:object-cover"
-            whileHover={{ scale: 1.02 }}
+            className="w-full max-h-[min(90vh,720px)] min-h-[400px] object-contain object-center bg-[#161B1E] shadow-2xl"
+            whileHover={{ scale: 1.01 }}
             transition={{ duration: 0.4 }}
           />
         </motion.div>
@@ -102,7 +102,7 @@ export default function SingleProject() {
               <motion.img
                 src={project.designImages[0]}
                 alt="design-left"
-                className="w-full h-[420px] object-cover shadow-lg"
+                className="w-full h-[420px] object-contain object-center bg-[#161B1E] shadow-lg"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
@@ -134,7 +134,7 @@ export default function SingleProject() {
               <motion.img
                 src={project.designImages[1]} // ✅ fixed index (was 2)
                 alt="design-right"
-                className="w-full h-[420px] object-cover shadow-lg"
+                className="w-full h-[420px] object-contain object-center bg-[#161B1E] shadow-lg"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
@@ -156,7 +156,7 @@ export default function SingleProject() {
             <img
               src={project.wideImage}
               alt="project-wide"
-              className="w-full h-[400px] object-cover shadow-2xl md:h-[600px]"
+              className="w-full min-h-[400px] max-h-[720px] object-contain object-center bg-[#161B1E] shadow-2xl md:min-h-[500px]"
             />
           </motion.div>
         )}

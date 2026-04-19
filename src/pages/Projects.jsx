@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import ContactSection from "../components/Contact";
 import Footer from "../components/Footer";
 import HeroSection from "../components/HeroSection";
@@ -59,10 +60,20 @@ export default function ProjectsPage() {
 
           {/* Projects Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {filteredProjects.map((proj) => (
+            {filteredProjects.map((proj, i) => (
+              <motion.div
+                key={proj.id}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{
+                  duration: 0.55,
+                  ease: [0.25, 0.1, 0.25, 1],
+                  delay: Math.min(i * 0.06, 0.36),
+                }}
+              >
               <Link
                 to={`/projects/${proj.id}`}
-                key={proj.id}
                 className="group block overflow-hidden shadow-lg hover:shadow-2xl transition duration-500"
               >
                 <div className="relative">
@@ -78,6 +89,7 @@ export default function ProjectsPage() {
                   </h3>
                 </div>
               </Link>
+              </motion.div>
             ))}
           </div>
         </div>

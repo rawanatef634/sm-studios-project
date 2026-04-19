@@ -1,4 +1,8 @@
-// src/data/projectsDetails.js
+/**
+ * Single source for project pages and the projects listing.
+ * To add or edit a project: duplicate an entry, set a unique `id`, and add image paths under `public/assets/`.
+ * For a full CMS later, replace this array with data from a headless CMS or Netlify CMS.
+ */
 export const projects = [
   {
     id: 1,

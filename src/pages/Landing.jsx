@@ -22,11 +22,11 @@ export default function Home() {
       {/* Team Section */}
       <Team />
 
+      {/* Projects Showcase (before partners per layout brief) */}
+      <Projects />
+
       {/* Clients Section */}
       <Clients />
-
-      {/* Projects Showcase */}
-      <Projects />
 
       {/* Contact CTA */}
       <Contact />

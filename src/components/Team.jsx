@@ -2,36 +2,37 @@
 import { motion } from "framer-motion";
 
 export default function Team() {
+  /** Order: founders first, then Talal, then team (per brief). Replace image paths when new assets are added. */
   const teamMembers = [
-    {
-      name: "Mohammed Al-Habsi",
-      role: "Co-Founder | CFO",
-      image: "/assets/Mohammed Al-Habsi.png",
-    },
     {
       name: "Muhannad Al-Hinai",
       role: "Managing Partner | CEO",
       image: "/assets/Muhannad Al-Hinai.png",
     },
     {
-      name: "Abulbasith",
-      role: "Architect",
-      image: "/assets/Abdulbasith.jpeg",
-    },
-    {
-      name: "Reemi Mahoudh",
-      role: "Interior Designer",
-      image: "/assets/Reemi Mahoudh.jpeg",
-    },
-    {
-      name: "Raiyan Eltoqi.jpeq",
-      role: "Interior Designer",
-      image: "/assets/Raiyan Eltoqi.jpeg",
+      name: "Mohammed Al-Habsi",
+      role: "Co-Founder | CFO",
+      image: "/assets/Mohammed Al-Habsi.png",
     },
     {
       name: "Talal Alhabsi",
-      role: "Junior Interior Designer",
+      role: "Site Supervisor",
       image: "/assets/Talal Alhabsi.jpeg",
+    },
+    {
+      name: "Hamida",
+      role: "Senior Interior Engineer",
+      image: "/assets/Reemi Mahoudh.jpeg",
+    },
+    {
+      name: "Basith",
+      role: "Senior Interior Engineer",
+      image: "/assets/Abdulbasith.jpeg",
+    },
+    {
+      name: "Rayan",
+      role: "Graphic Designer",
+      image: "/assets/Raiyan Eltoqi.jpeg",
     },
   ];
 
@@ -85,12 +86,14 @@ export default function Team() {
               }}
               transition={{ duration: 0.7, ease: "easeOut" }}
             >
-              {/* Image */}
-              <img
-                src={member.image}
-                alt={member.name}
-                className="w-60 h-60 sm:w-60 sm:h-60 object-cover mx-auto mb-4 shadow-md block"
-              />
+              {/* Image — tighter crop (closer portrait) */}
+              <div className="w-60 h-60 mx-auto mb-4 overflow-hidden shadow-md">
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  className="w-full h-full object-cover object-[center_18%] scale-110"
+                />
+              </div>
 
               {/* Text */}
               <div>

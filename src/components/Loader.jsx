@@ -49,7 +49,7 @@ export default function PageLoader({ pathname }) {
           <motion.div
             className="absolute inset-0"
             style={{
-              background: "radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%)",
+              background: "radial-gradient(circle at center, rgba(34, 197, 94, 0.18) 0%, transparent 70%)",
             }}
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1.5 }}
@@ -60,7 +60,7 @@ export default function PageLoader({ pathname }) {
           {[...Array(8)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 bg-blue-400/40 rounded-full"
+              className="absolute w-1 h-1 bg-emerald-400/45 rounded-full"
               initial={{
                 x: 0,
                 y: 0,
@@ -103,7 +103,7 @@ export default function PageLoader({ pathname }) {
           >
             {/* Pulsing glow behind logo */}
             <motion.div
-              className="absolute inset-0 blur-3xl bg-blue-500/30 rounded-full"
+              className="absolute inset-0 blur-3xl bg-emerald-500/35 rounded-full"
               animate={{
                 scale: [1, 1.3, 1],
                 opacity: [0.3, 0.6, 0.3],
@@ -123,9 +123,9 @@ export default function PageLoader({ pathname }) {
               animate={{
                 y: [0, -8, 0],
                 filter: [
-                  "brightness(1) drop-shadow(0 0 20px rgba(59, 130, 246, 0.5))",
-                  "brightness(1.2) drop-shadow(0 0 30px rgba(59, 130, 246, 0.8))",
-                  "brightness(1) drop-shadow(0 0 20px rgba(59, 130, 246, 0.5))",
+                  "brightness(1) drop-shadow(0 0 20px rgba(34, 197, 94, 0.45))",
+                  "brightness(1.2) drop-shadow(0 0 30px rgba(34, 197, 94, 0.75))",
+                  "brightness(1) drop-shadow(0 0 20px rgba(34, 197, 94, 0.45))",
                 ],
               }}
               transition={{
@@ -144,7 +144,7 @@ export default function PageLoader({ pathname }) {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <motion.div
-              className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-full"
+              className="h-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-600 rounded-full"
               initial={{ x: "-100%" }}
               animate={{ x: "100%" }}
               transition={{

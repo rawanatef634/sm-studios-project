@@ -50,12 +50,17 @@ export default function Services() {
               className="absolute inset-0 w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-110"
             />
 
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-60 transition-opacity duration-500" />
+            {/* Base gradient so titles stay readable (Figma-style legibility) */}
+            <div
+              className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-t from-black/85 via-black/45 to-black/25"
+              aria-hidden
+            />
+            {/* Stronger overlay on hover */}
+            <div className="absolute inset-0 z-[1] bg-black/20 opacity-0 group-hover:opacity-40 transition-opacity duration-500 pointer-events-none" />
 
             {/* Title */}
             <motion.div
-              className="absolute inset-0 flex items-center justify-center text-center z-10"
+              className="absolute inset-0 flex items-center justify-center text-center z-[2]"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut", delay: idx * 0.3 }}
@@ -67,7 +72,7 @@ export default function Services() {
             </motion.div>
 
             {/* Hover Text */}
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-5 pt-5 text-center text-white opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:delay-300">
+            <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center px-5 pt-5 text-center text-white opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:delay-300">
               <motion.span
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Facebook, Instagram, Youtube, MessageCircle } from "lucide-react";
+import { Facebook, Instagram, Youtube } from "lucide-react";
+import WhatsAppIcon from "./icons/WhatsAppIcon";
 
 const slides = [
   {
@@ -134,7 +135,7 @@ export default function HeroSection() {
           aria-label="WhatsApp"
           className="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
         >
-          <MessageCircle className="w-5 h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-80" />
+          <WhatsAppIcon className="w-5 h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-80" />
         </a>
 
         <a

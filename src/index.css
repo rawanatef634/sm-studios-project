@@ -8,3 +8,11 @@ body {
   font-family: 'El Messiri', sans-serif;
 }
 
+/* Landing portfolio — matches Figma: serif titles + sans labels */
+.font-portfolio-serif {
+  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+}
+.font-portfolio-sans {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+

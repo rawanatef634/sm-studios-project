@@ -3,10 +3,23 @@ import { motion } from "framer-motion";
 
 export default function About() {
   return (
-    <section className="relative bg-[#0f1113] text-white w-full md:max-w-[2205px] md:h-[982px] mx-auto overflow-hidden my-10 ">
+    <section
+      id="about"
+      className="relative bg-[#0f1113] text-white w-full md:max-w-[2205px] md:h-[982px] mx-auto overflow-hidden my-10"
+    >
+      {/* Subtle grid pattern (Figma-style background) */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)`,
+          backgroundSize: "48px 48px",
+        }}
+        aria-hidden
+      />
       {/* Title */}
       <motion.p
-        className="block text-center my-10 md:absolute left-6 md:left-[100px] top-[60px] md:top-[92px] uppercase font-['El_Messiri'] font-semibold text-[20px] md:text-[24px] leading-[32px] md:leading-[38px] text-[#919AA0]"
+        className="relative z-10 block text-center my-10 md:absolute left-6 md:left-[100px] top-[60px] md:top-[92px] uppercase font-['El_Messiri'] font-semibold text-[20px] md:text-[24px] leading-[32px] md:leading-[38px] text-[#919AA0]"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
@@ -16,7 +29,7 @@ export default function About() {
       </motion.p>
 
       {/* Container for layout on mobile */}
-      <div className="flex flex-col md:block items-center md:items-start justify-center h-full mt-24 md:mt-0">
+      <div className="relative z-10 flex flex-col md:block items-center md:items-start justify-center h-full mt-24 md:mt-0">
         {/* Text content */}
         <motion.div
           className="relative md:absolute flex flex-col items-start gap-[40px] md:gap-[55px] w-[90%] md:w-[645px] h-auto md:h-[516px] left-0 md:left-[100px] mx-auto md:mx-0 md:top-1/2 md:-translate-y-1/2 px-4 md:px-0"
@@ -63,16 +76,16 @@ export default function About() {
 
         {/* Image */}
         <motion.div
-          className="relative md:absolute w-[250px] md:w-[459.9px] h-[400px] md:h-[838.95px] md:left-[952.05px]  md:translate-x-0 mt-10 md:mt-0 bottom-0"
+          className="relative md:absolute w-[250px] md:w-[459.9px] h-[400px] md:h-[838.95px] md:left-[952.05px] md:translate-x-0 mt-10 md:mt-0 bottom-0"
           initial={{ opacity: 0, x: 80 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.6 }}
           viewport={{ once: true }}
         >
           <img
-            src="/assets/villa4.png"
-            alt="About SM Studios"
-            className="w-full h-full object-cover border-white border-t-[4px] border-l-[4px] border-r-[4px] rounded-t-[12px]"
+            src="/assets/majlis2.png"
+            alt="About SM Studios — Majlis exterior"
+            className="w-full h-full object-cover object-center border-white border-t-[4px] border-l-[4px] border-r-[4px] rounded-t-[12px]"
           />
         </motion.div>
       </div>
