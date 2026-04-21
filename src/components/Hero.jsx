@@ -7,19 +7,19 @@ const slides = [
   {
     id: 1,
     title: "MAJLIS",
-    image: "/assets/majlis2.png",
+    image: "/assets/majlis3.png",
     link: "/projects/1",
   },
   {
     id: 2,
     title: "MATIHA BOUTIQUE",
-    image: "/assets/ms.png",
+    image: "/assets/ms4.png",
     link: "/projects/2",
   },
   {
     id: 3,
     title: "BLUSH SPA",
-    image: "/assets/bs2.jpg",
+    image: "/assets/bs1.jpg",
     link: "/projects/3",
   },
 ];
