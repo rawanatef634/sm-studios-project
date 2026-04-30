@@ -4,11 +4,10 @@ import ContactSection from "../components/Contact";
 import Footer from "../components/Footer";
 import HeroSection from "../components/HeroSection";
 import { useState } from "react";
-
-// Import centralized project data
-import { projects } from "../data/projectsDetails";
+import { useProjects } from "../context/ProjectsContext";
 
 export default function ProjectsPage() {
+  const { projects } = useProjects();
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const categories = [
