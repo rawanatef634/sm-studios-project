@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 /** @typedef {import("../types/project").Project} Project */
 
@@ -33,6 +33,22 @@ export default function ProjectForm({
   const [story, setStory] = useState(initialProject?.story ?? "");
   const [wideImage, setWideImage] = useState(initialProject?.wideImage ?? "");
   const [approach, setApproach] = useState(initialProject?.approach ?? "");
+
+  useEffect(() => {
+    setTitle(initialProject?.title ?? "");
+    setBreadcrumb(initialProject?.breadcrumb ?? "");
+    setHeroImage(initialProject?.heroImage ?? "");
+    setImg(initialProject?.img ?? "");
+    setMainImage(initialProject?.mainImage ?? "");
+    setStateField(initialProject?.state ?? "");
+    setTown(initialProject?.town ?? "");
+    setArea(initialProject?.area ?? "");
+    setDesignImage1(initialProject?.designImages?.[0] ?? "");
+    setDesignImage2(initialProject?.designImages?.[1] ?? "");
+    setStory(initialProject?.story ?? "");
+    setWideImage(initialProject?.wideImage ?? "");
+    setApproach(initialProject?.approach ?? "");
+  }, [initialProject]);
   const isValid =
     title.trim() &&
     breadcrumb.trim() &&
@@ -66,136 +82,140 @@ export default function ProjectForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 max-w-3xl">
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Title *</span>
+    <form onSubmit={handleSubmit} className="grid gap-5 max-w-4xl">
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Title *</span>
         <input
         required
         placeholder="title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Breadcrumb *</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Breadcrumb *</span>
         <input
         required
         placeholder="breadcrumb"
         value={breadcrumb}
         onChange={(e) => setBreadcrumb(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Hero Image</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Hero Image</span>
         <input
         placeholder="heroImage"
         value={heroImage}
         onChange={(e) => setHeroImage(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Image</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Image</span>
         <input
         placeholder="img"
         value={img}
         onChange={(e) => setImg(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Main Image</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Main Image</span>
         <input
         placeholder="mainImage"
         value={mainImage}
         onChange={(e) => setMainImage(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">State *</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">State *</span>
         <input
         required
         placeholder="state"
         value={stateField}
         onChange={(e) => setStateField(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Town *</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Town *</span>
         <input
         required
         placeholder="town"
         value={town}
         onChange={(e) => setTown(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Area *</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Area *</span>
         <input
         required
         placeholder="area"
         value={area}
         onChange={(e) => setArea(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Design Image 1</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Design Image 1</span>
         <input
         placeholder="designImage1"
         value={designImage1}
         onChange={(e) => setDesignImage1(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Design Image 2</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Design Image 2</span>
         <input
         placeholder="designImage2"
         value={designImage2}
         onChange={(e) => setDesignImage2(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Story *</span>
+      </div>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Story *</span>
         <textarea
         required
         placeholder="story"
         value={story}
         onChange={(e) => setStory(e.target.value)}
-        className="border rounded-md px-3 py-2 min-h-24"
+        className="min-h-28 rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Wide Image</span>
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Wide Image</span>
         <input
         placeholder="wideImage"
         value={wideImage}
         onChange={(e) => setWideImage(e.target.value)}
-        className="border rounded-md px-3 py-2"
+        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
-      <label className="grid gap-1">
-        <span className="text-sm font-medium text-gray-700">Approach</span>
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Approach</span>
         <textarea
         placeholder="approach"
         value={approach}
         onChange={(e) => setApproach(e.target.value)}
-        className="border rounded-md px-3 py-2 min-h-24"
+        className="min-h-24 rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
       />
       </label>
+      </div>
 
-      <div className="flex gap-2">
+      <div className="mt-2 flex gap-2">
         <button
           type="submit"
           disabled={!isValid}
-          className="bg-black text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-md bg-cyan-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitLabel}
         </button>
@@ -203,7 +223,7 @@ export default function ProjectForm({
           <button
             type="button"
             onClick={onCancel}
-            className="border rounded-md px-4 py-2"
+            className="rounded-md border border-slate-600 px-4 py-2 text-slate-100 transition hover:bg-slate-800"
           >
             Cancel
           </button>

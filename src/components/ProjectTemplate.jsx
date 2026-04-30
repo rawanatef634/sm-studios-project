@@ -50,7 +50,7 @@ export default function ProjectTemplate({ project }) {
           <motion.img
             src={project.mainImage || project.img}
             alt={project.title}
-            className="w-full max-h-[min(90vh,720px)] min-h-[400px] object-contain object-center bg-[#161B1E] shadow-2xl"
+            className="w-full max-h-[min(90vh,720px)] min-h-[700px] object-contain object-center bg-[#161B1E] shadow-2xl"
             whileHover={{ scale: 1.01 }}
             transition={{ duration: 0.4 }}
           />
@@ -64,7 +64,7 @@ export default function ProjectTemplate({ project }) {
           viewport={{ once: true }}
           variants={staggerParent}
         >
-          <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-8 text-white text-xl md:text-2xl font-light">
+          <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-8 text-white text-xl md:text-2xl font-light">
             {[
               { label: "State", value: project.state },
               { label: "Town", value: project.town },
