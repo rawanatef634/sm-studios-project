@@ -12,20 +12,22 @@
  *
  * Safety rules:
  *  A) Missing Blob → seed once from projectsDetails.js, persist, return.
- *  B) Existing non-empty Blob → return as-is (never auto-replace with seed).
- *  C) Existing empty Blob → reseed from projectsDetails.js (portfolio must not
- *     stay blank after a failed first write / empty bootstrap).
+ *  B) Existing Blob (including []) → return as-is (never auto-replace with seed).
+ *  C) Blob auth/network/parse failures → throw (never silent empty array / seed).
  *  D) Refuse accidental empty overwrites of a non-empty store.
- *  E) Blob auth/network failures → throw (never silent empty array).
- *  F) No BLOB_READ_WRITE_TOKEN → seed in-memory (+ best-effort local file).
+ *  E) No Blob token → seed in-memory (+ best-effort local file).
  *     On Vercel without a token the FS is read-only; still return the seed so
- *     production never shows zero projects.
+ *     the public site is not blank. That path is not persistent storage.
+ *
+ * Blob store must be PUBLIC. Project images are public website assets.
+ * put() uses access: "public" to match that store configuration.
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { list, put } from "@vercel/blob";
 import { projects as seedProjects } from "../../src/data/projectsDetails.js";
+import { blobAuth, hasBlobToken } from "./blobAuth.js";
 
 export const PROJECTS_PATH = "sm-studios/projects.json";
 
@@ -49,10 +51,6 @@ function cloneProjects(projects) {
   return JSON.parse(JSON.stringify(projects));
 }
 
-function hasBlobToken() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-}
-
 function readLocalFile() {
   if (!existsSync(LOCAL_PROJECTS_FILE)) return null;
   const data = JSON.parse(readFileSync(LOCAL_PROJECTS_FILE, "utf8"));
@@ -73,7 +71,7 @@ function writeLocalFile(projects) {
  * Never falls back to an unrelated blob under the same prefix.
  */
 async function findProjectsBlob() {
-  const { blobs } = await list({ prefix: PROJECTS_PATH });
+  const { blobs } = await list({ prefix: PROJECTS_PATH, ...blobAuth() });
   return blobs.find((b) => b.pathname === PROJECTS_PATH) || null;
 }
 
@@ -97,7 +95,24 @@ async function snapshotForGuard() {
     );
   }
   const data = await resp.json();
-  return Array.isArray(data) ? data : [];
+  if (!Array.isArray(data)) {
+    throw new ProjectStoreError(
+      "Cannot verify project store before write (Blob JSON is not an array).",
+      502,
+    );
+  }
+  return data;
+}
+
+function blobWriteError(err) {
+  const message = err?.message || String(err);
+  if (/private store/i.test(message) || /public access/i.test(message)) {
+    return new ProjectStoreError(
+      "Blob store access mismatch: this app requires a public Blob store.",
+      500,
+    );
+  }
+  return new ProjectStoreError("Failed to write project store.", 502);
 }
 
 // ---------------------------------------------------------------------------
@@ -117,14 +132,14 @@ export async function loadProjects() {
     try {
       writeLocalFile(seed);
       console.info(
-        `[projectStore] No BLOB_READ_WRITE_TOKEN — seeded local file store from projectsDetails.js (${seed.length} projects). ` +
+        `[projectStore] No Blob token — seeded local file store from projectsDetails.js (${seed.length} projects). ` +
           `Path: .data/projects.local.json.`,
       );
     } catch (err) {
       // Vercel serverless FS is read-only outside /tmp — still serve the seed.
       console.warn(
-        `[projectStore] No BLOB_READ_WRITE_TOKEN and local write failed (${err.message}). ` +
-          `Returning in-memory seed (${seed.length} projects). Set BLOB_READ_WRITE_TOKEN in Vercel for persistence.`,
+        `[projectStore] No Blob token and local write failed (${err.message}). ` +
+          `Returning in-memory seed (${seed.length} projects). Set a public-store Blob token in Vercel for persistence.`,
       );
     }
     return seed;
@@ -151,8 +166,7 @@ export async function loadProjects() {
     return seed;
   }
 
-  // Rule B — non-empty Blob → return as-is.
-  // Rule C — empty Blob → reseed (blank portfolio is never intentional bootstrap).
+  // Rule B — existing object, including [], is the source of truth.
   try {
     const resp = await fetch(`${blob.url}?t=${Date.now()}`);
     if (!resp.ok) {
@@ -161,14 +175,6 @@ export async function loadProjects() {
     const data = await resp.json();
     if (!Array.isArray(data)) {
       throw new Error("Blob project data is not an array.");
-    }
-    if (data.length === 0) {
-      const seed = cloneProjects(seedProjects);
-      await persistProjects(seed);
-      console.info(
-        `[projectStore] ${PROJECTS_PATH} was empty — reseeded ${seed.length} projects from projectsDetails.js.`,
-      );
-      return seed;
     }
     return data;
   } catch (err) {
@@ -221,12 +227,19 @@ export async function persistProjects(projects, options = {}) {
     return;
   }
 
-  await put(PROJECTS_PATH, JSON.stringify(projects), {
-    access: "public",
-    contentType: "application/json",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-  });
+  try {
+    await put(PROJECTS_PATH, JSON.stringify(projects), {
+      access: "public",
+      contentType: "application/json",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      ...blobAuth(),
+    });
+  } catch (err) {
+    if (err instanceof ProjectStoreError) throw err;
+    console.error("[projectStore] Blob write failed:", err.message);
+    throw blobWriteError(err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -251,7 +264,7 @@ export async function inspectProjectsStore() {
       exists: null,
       count: existing ? existing.length : seedProjects.length,
       note:
-        "BLOB_READ_WRITE_TOKEN unset — Blob was not contacted. Local file store: .data/projects.local.json",
+        "Blob token unset — Blob was not contacted. Local file store: .data/projects.local.json",
       localFileExists: Boolean(existing),
     };
   }

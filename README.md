@@ -46,9 +46,10 @@ npm run dev:vite
 |----------|---------|
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD_HASH` | Staff login |
 | `SESSION_SECRET` | Signed session cookie |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob read/write |
+| `SMS_PUBLIC_READ_WRITE_TOKEN` | Preferred Vercel Blob token (public store) |
+| `BLOB_READ_WRITE_TOKEN` | Fallback Blob token (ignored if the public-store token is set) |
 
-Without `BLOB_READ_WRITE_TOKEN`:
+Without a Blob token:
 
 - `/api/projects` uses a **local file-backed** copy of the 10 seed projects from `projectsDetails.js` (`.data/projects.local.json`)
 - Create / edit / delete work for the current `npm run dev` session (shared across API isolates)
@@ -56,12 +57,14 @@ Without `BLOB_READ_WRITE_TOKEN`:
 - Blob is **not** read or written
 - Image upload (`/api/upload`) requires a Blob token and will fail without it
 
-With `BLOB_READ_WRITE_TOKEN`:
+With a Blob token:
 
 - Production-like Blob persistence
 - Missing `sm-studios/projects.json` → seed once from `projectsDetails.js`
 - Existing Blob (including empty `[]`) → returned as-is; **never** auto-replaced by the seed
 - Blob auth/network errors → API error (no silent seed fallback)
+
+The Blob store must be **public**. Project images are public website assets. A private store rejects `access: "public"` writes.
 
 ### Inspect Blob (read-only)
 

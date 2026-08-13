@@ -40,13 +40,16 @@ const loadedEnv = loadEnvFile(resolve(root, ".env"));
 const { inspectProjectsStore, PROJECTS_PATH } = await import(
   "../api/_utils/projectStore.js"
 );
+const { getBlobTokenSource, hasBlobToken } = await import(
+  "../api/_utils/blobAuth.js"
+);
 
-const hasToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+const hasToken = hasBlobToken();
 
 console.log("SM Studios — projects store inspection (read-only)");
 console.log("--------------------------------------------------");
 console.log(`Env files: .env.local=${loadedLocal ? "loaded" : "missing"}, .env=${loadedEnv ? "loaded" : "missing"}`);
-console.log(`BLOB_READ_WRITE_TOKEN: ${hasToken ? "present" : "absent"}`);
+console.log(`Blob token: ${hasToken ? "present" : "absent"} (${getBlobTokenSource() || "none"})`);
 console.log(`Target path: ${PROJECTS_PATH}`);
 console.log("");
 

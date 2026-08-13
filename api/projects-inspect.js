@@ -7,6 +7,7 @@
  * diagnostics but never mutates state and never returns secrets.
  */
 import { inspectProjectsStore } from "./_utils/projectStore.js";
+import { getBlobTokenSource, hasBlobToken } from "./_utils/blobAuth.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -18,7 +19,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       ...result,
       // Never echo credentials or raw env values.
-      tokenConfigured: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+      tokenConfigured: hasBlobToken(),
+      tokenSource: getBlobTokenSource(),
     });
   } catch (err) {
     console.error("[projects-inspect] error:", err.message);

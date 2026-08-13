@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+.data
+.netlify
+.vercel
+.env
+.env.*
+*.local
+logs
+*.log

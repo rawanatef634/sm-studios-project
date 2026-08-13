@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { put } from "@vercel/blob";
 import { verifySession, readJsonBody } from "./_utils/auth.js";
+import { blobAuth, hasBlobToken } from "./_utils/blobAuth.js";
 import { optimizeImageBuffer } from "./_utils/optimizeImage.js";
 
 // ---------------------------------------------------------------------------
@@ -19,12 +20,8 @@ const ALLOWED_MIME = new Set([
 const MAX_BYTES = 3 * 1024 * 1024;
 
 const ROOT = process.cwd();
-/** Local-only uploads when BLOB_READ_WRITE_TOKEN is unset (served by Vite from /uploads). */
+/** Local-only uploads when no Blob token is set (served by Vite from /uploads). */
 const LOCAL_UPLOAD_DIR = resolve(ROOT, "public/uploads");
-
-function hasBlobToken() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-}
 
 /**
  * @param {Buffer} fileBuffer
@@ -39,18 +36,27 @@ async function storeImage(fileBuffer, ext, contentType) {
     mkdirSync(LOCAL_UPLOAD_DIR, { recursive: true });
     writeFileSync(resolve(LOCAL_UPLOAD_DIR, filename), fileBuffer);
     console.info(
-      `[upload] No BLOB_READ_WRITE_TOKEN — saved locally as /uploads/${filename}`,
+      `[upload] No Blob token — saved locally as /uploads/${filename}`,
     );
     return `/uploads/${filename}`;
   }
 
   const pathname = `sm-studios/images/${filename}`;
-  const blob = await put(pathname, fileBuffer, {
-    access: "public",
-    contentType,
-    addRandomSuffix: false,
-  });
-  return blob.url;
+  try {
+    const blob = await put(pathname, fileBuffer, {
+      access: "public",
+      contentType,
+      addRandomSuffix: false,
+      ...blobAuth(),
+    });
+    return blob.url;
+  } catch (err) {
+    const message = err?.message || String(err);
+    if (/private store/i.test(message) || /public access/i.test(message)) {
+      throw new Error("Blob store access mismatch: uploads require a public Blob store.");
+    }
+    throw err;
+  }
 }
 
 /**

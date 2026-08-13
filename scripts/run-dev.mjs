@@ -72,8 +72,14 @@ const childEnv = { ...process.env };
 const loadedLocal = loadEnvFile(resolve(root, ".env.local"), childEnv);
 const loadedEnv = loadEnvFile(resolve(root, ".env"), childEnv);
 
+const blobTokenSource = childEnv.SMS_PUBLIC_READ_WRITE_TOKEN
+  ? "SMS_PUBLIC_READ_WRITE_TOKEN"
+  : childEnv.BLOB_READ_WRITE_TOKEN
+    ? "BLOB_READ_WRITE_TOKEN"
+    : "none";
+
 console.info(
-  `[dev] env: .env.local=${loadedLocal ? "loaded" : "missing"}, .env=${loadedEnv ? "loaded" : "missing"}, BLOB_READ_WRITE_TOKEN=${childEnv.BLOB_READ_WRITE_TOKEN ? "present" : "absent"}`,
+  `[dev] env: .env.local=${loadedLocal ? "loaded" : "missing"}, .env=${loadedEnv ? "loaded" : "missing"}, Blob token=${blobTokenSource === "none" ? "absent" : "present"} (${blobTokenSource})`,
 );
 
 const vercelBin = resolveVercelBin();
