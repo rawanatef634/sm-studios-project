@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Facebook, Instagram, Youtube } from "lucide-react";
 import WhatsAppIcon from "./icons/WhatsAppIcon";
+import OptimizedImage from "./OptimizedImage";
 
 const slides = [
   {
@@ -46,11 +47,13 @@ export default function HeroSection() {
           exit={{ opacity: 0 }}
           transition={{ duration: 1.2 }}
         >
-          <div
-            className="w-full h-full bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${slides[current].image})`,
-            }}
+          <OptimizedImage
+            src={slides[current].image}
+            alt=""
+            className="h-full w-full object-cover object-center"
+            sizes="100vw"
+            fill
+            priority
           />
         </motion.div>
       </AnimatePresence>

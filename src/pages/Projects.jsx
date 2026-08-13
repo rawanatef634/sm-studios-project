@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import ContactSection from "../components/Contact";
 import Footer from "../components/Footer";
 import HeroSection from "../components/HeroSection";
+import OptimizedImage from "../components/OptimizedImage";
 import { useState } from "react";
 import { useProjects } from "../context/ProjectsContext";
 
@@ -76,11 +77,11 @@ export default function ProjectsPage() {
                 className="group block overflow-hidden shadow-lg hover:shadow-2xl transition duration-500"
               >
                 <div className="relative">
-                  <img
+                  <OptimizedImage
                     src={proj.img || proj.heroImage || proj.mainImage}
                     alt={`${proj.title} preview`}
-                    loading="lazy"
                     className="w-full h-[350px] object-cover transform group-hover:scale-110 transition duration-500 ease-out"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition duration-300" />
                   <h3 className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white text-xl font-medium tracking-wide opacity-0 group-hover:opacity-100 transition duration-300">

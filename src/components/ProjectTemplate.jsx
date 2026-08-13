@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import ContactSection from "../components/Contact";
 import Footer from "../components/Footer";
 import HeroSection from "../components/HeroSection";
+import OptimizedImage from "../components/OptimizedImage";
 
 /** @typedef {import("../types/project").Project} Project */
 
@@ -47,13 +48,19 @@ export default function ProjectTemplate({ project }) {
           viewport={{ once: true }}
           variants={fadeUp}
         >
-          <motion.img
-            src={project.mainImage || project.img}
-            alt={project.title}
-            className="w-full h-[500px] object-contain shadow-2xl md:object-cover"
+          <motion.div
+            className="overflow-hidden shadow-2xl"
             whileHover={{ scale: 1.01 }}
             transition={{ duration: 0.4 }}
-          />
+          >
+            <OptimizedImage
+              src={project.mainImage || project.img}
+              alt={project.title}
+              className="w-full h-[500px] object-contain md:object-cover"
+              sizes="(max-width: 1280px) 100vw, 1280px"
+              priority
+            />
+          </motion.div>
         </motion.div>
 
         {/* PROJECT INFO ROW */}
@@ -90,15 +97,20 @@ export default function ProjectTemplate({ project }) {
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6">
             {/* Left Image */}
             {project.designImages?.[0] && (
-              <motion.img
-                src={project.designImages[0]}
-                alt="design-left"
-                className="w-full h-[420px] object-cover shadow-lg"
+              <motion.div
+                className="overflow-hidden shadow-lg"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
-              />
+              >
+                <OptimizedImage
+                  src={project.designImages[0]}
+                  alt="design-left"
+                  className="w-full h-[420px] object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </motion.div>
             )}
 
             {/* Center Text Block */}
@@ -121,15 +133,20 @@ export default function ProjectTemplate({ project }) {
 
             {/* Right Image */}
             {project.designImages?.[1] && (
-              <motion.img
-                src={project.designImages[1]} // ✅ fixed index (was 2)
-                alt="design-right"
-                className="w-full h-[420px] object-cover shadow-lg"
+              <motion.div
+                className="overflow-hidden shadow-lg"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
-              />
+              >
+                <OptimizedImage
+                  src={project.designImages[1]}
+                  alt="design-right"
+                  className="w-full h-[420px] object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </motion.div>
             )}
           </div>
         </section>
@@ -143,10 +160,11 @@ export default function ProjectTemplate({ project }) {
             viewport={{ once: true }}
             variants={fadeUp}
           >
-            <img
+            <OptimizedImage
               src={project.wideImage}
               alt="project-wide"
               className="w-full h-[400px] object-cover shadow-2xl md:h-[600px]"
+              sizes="(max-width: 1280px) 100vw, 1280px"
             />
           </motion.div>
         )}

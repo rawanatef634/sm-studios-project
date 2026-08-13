@@ -3,9 +3,10 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { put } from "@vercel/blob";
 import { verifySession, readJsonBody } from "./_utils/auth.js";
+import { optimizeImageBuffer } from "./_utils/optimizeImage.js";
 
 // ---------------------------------------------------------------------------
-// Allowed MIME types and their file extensions
+// Allowed MIME types (input). Output is always optimized WebP.
 // ---------------------------------------------------------------------------
 const ALLOWED_MIME = new Set([
   "image/jpeg",
@@ -13,12 +14,6 @@ const ALLOWED_MIME = new Set([
   "image/webp",
   "image/avif",
 ]);
-const MIME_EXT = {
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/webp": ".webp",
-  "image/avif": ".avif",
-};
 
 // ~3 MB binary ≈ ~4 MB base64 — stays under Vercel’s ~4.5 MB body limit
 const MAX_BYTES = 3 * 1024 * 1024;
@@ -33,11 +28,11 @@ function hasBlobToken() {
 
 /**
  * @param {Buffer} fileBuffer
- * @param {string} mimeType
+ * @param {string} ext
+ * @param {string} contentType
  * @returns {Promise<string>}
  */
-async function storeImage(fileBuffer, mimeType) {
-  const ext = MIME_EXT[mimeType];
+async function storeImage(fileBuffer, ext, contentType) {
   const filename = `${randomUUID()}${ext}`;
 
   if (!hasBlobToken()) {
@@ -52,7 +47,7 @@ async function storeImage(fileBuffer, mimeType) {
   const pathname = `sm-studios/images/${filename}`;
   const blob = await put(pathname, fileBuffer, {
     access: "public",
-    contentType: mimeType,
+    contentType,
     addRandomSuffix: false,
   });
   return blob.url;
@@ -77,8 +72,7 @@ function decodeBase64Payload(data) {
 
 // ---------------------------------------------------------------------------
 // Handler — JSON body: { contentType, data (base64 or data-URL) }
-// Multipart is unreliable under vercel-dev (empty stream), so the dashboard
-// sends JSON like the other working API routes.
+// Automatically optimizes to WebP (max ~1920px) before storage.
 // ---------------------------------------------------------------------------
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -130,10 +124,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url = await storeImage(fileBuffer, mimeType);
-    return res.status(200).json({ url });
+    const optimized = await optimizeImageBuffer(fileBuffer);
+    const url = await storeImage(
+      optimized.buffer,
+      optimized.ext,
+      optimized.contentType,
+    );
+    return res.status(200).json({
+      url,
+      optimized: true,
+      bytes: optimized.buffer.length,
+    });
   } catch (err) {
-    console.error("[upload] store error:", err.message);
+    console.error("[upload] store/optimize error:", err.message);
     return res.status(500).json({
       error: hasBlobToken()
         ? "Image upload failed."

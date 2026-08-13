@@ -76,6 +76,7 @@ export default function PortfolioCarousel() {
                 alt={leftProject.title}
                 className="h-full w-full object-cover"
                 sizes="(max-width: 1200px) 26vw, 280px"
+                fill
               />
             </div>
             <p className="pt-2 text-[11px] leading-[1.25] text-[#a1a1a1]">
@@ -95,6 +96,7 @@ export default function PortfolioCarousel() {
                 alt={centerProject.title}
                 className="h-full w-full object-cover"
                 sizes="(max-width: 1200px) 48vw, 560px"
+                fill
               />
             </div>
             <div className="flex items-start justify-between gap-4 pt-2.5">
@@ -119,6 +121,7 @@ export default function PortfolioCarousel() {
                 alt={rightProject.title}
                 className="h-full w-full object-cover"
                 sizes="(max-width: 1200px) 26vw, 280px"
+                fill
               />
             </div>
             <h3 className="pt-2 text-[44px] leading-[0.95] text-white">
@@ -139,6 +142,7 @@ export default function PortfolioCarousel() {
               alt={centerProject.title}
               className="h-full w-full object-cover"
               sizes="92vw"
+              fill
             />
           </div>
           <h3 className=" pt-3 text-4xl leading-none text-white">

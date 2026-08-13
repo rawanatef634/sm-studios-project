@@ -1,13 +1,8 @@
-// src/components/OptimizedImage.jsx
-import React from "react";
-
 /**
  * OptimizedImage
- * - Local assets ("/assets/name.jpg"): uses generated variants
- *   name-480/800/1200/1600 (.jpg + .webp) when present
- * - Remote/blob URLs: renders the original URL as-is (no resize, no variant rewrite)
- * - Display size is always controlled by the caller's className/container —
- *   this component does not invent aspect ratios
+ * - Local /assets paths: prefer generated -480/-800/-1200/-1600 webp+jpg when present
+ * - Remote /uploads / Blob URLs: use as-is (uploads are already WebP-optimized)
+ * - Display size is controlled by caller className/CSS — no invented aspect ratios
  */
 export default function OptimizedImage({
   src,
@@ -15,28 +10,33 @@ export default function OptimizedImage({
   className = "",
   sizes,
   style,
+  fill = false,
+  priority = false,
   ...rest
 }) {
   if (!src) return null;
 
   const [pathOnly] = src.split("?");
   const isRemote =
-    /^https?:\/\//i.test(pathOnly) || pathOnly.startsWith("//");
+    /^https?:\/\//i.test(pathOnly) ||
+    pathOnly.startsWith("//") ||
+    pathOnly.startsWith("/uploads/");
 
-  const fillStyle = {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    ...style,
-  };
+  const fillStyle = fill
+    ? { width: "100%", height: "100%", objectFit: "cover", ...style }
+    : style;
 
-  // Uploaded / absolute URLs: same fill behavior, original file (no processing)
+  const loading = priority ? "eager" : "lazy";
+  const fetchPriority = priority ? "high" : undefined;
+
   if (isRemote) {
     return (
       <img
         src={src}
         alt={alt}
-        loading="lazy"
+        loading={loading}
+        fetchPriority={fetchPriority}
+        decoding="async"
         className={className}
         style={fillStyle}
         {...rest}
@@ -47,17 +47,19 @@ export default function OptimizedImage({
   const normalized = pathOnly.startsWith("/") ? pathOnly.slice(1) : pathOnly;
   const extIndex = normalized.lastIndexOf(".");
   const base = extIndex !== -1 ? normalized.slice(0, extIndex) : normalized;
+  const original = `/${encodeAssetPath(normalized)}`;
 
   const widths = [480, 800, 1200, 1600];
-
   const makeSrcSet = (ext) =>
-    widths.map((w) => `/${base}-${w}.${ext} ${w}w`).join(", ");
+    widths
+      .map((w) => `/${encodeAssetPath(`${base}-${w}.${ext}`)} ${w}w`)
+      .join(", ");
 
   const defaultSizes =
     sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
 
   return (
-    <picture className="block h-full w-full">
+    <picture className={fill ? "block h-full w-full" : undefined}>
       <source
         type="image/webp"
         srcSet={makeSrcSet("webp")}
@@ -69,20 +71,24 @@ export default function OptimizedImage({
         sizes={defaultSizes}
       />
       <img
-        src={`/${base}-800.jpg`}
+        src={original}
         alt={alt}
-        loading="lazy"
+        loading={loading}
+        fetchPriority={fetchPriority}
+        decoding="async"
         sizes={defaultSizes}
         className={className}
         style={fillStyle}
-        onError={(e) => {
-          // fallback to original if optimized missing
-          if (e.currentTarget.src !== `/${normalized}`) {
-            e.currentTarget.src = `/${normalized}`;
-          }
-        }}
         {...rest}
       />
     </picture>
   );
+}
+
+/** Encode path segments but keep slashes (handles spaces in filenames). */
+function encodeAssetPath(path) {
+  return path
+    .split("/")
+    .map((seg) => encodeURIComponent(seg))
+    .join("/");
 }
