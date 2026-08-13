@@ -106,15 +106,8 @@ export default function Footer() {
           <ArrowUp className="w-30 h-40 text-gray-300" />
         </button>
 
-        {/* Copyright + discreet staff entry (does not expose /dashboard URL) */}
         <p className="text-sm text-gray-400 text-center md:text-right">
-          © 2025 SM STUDIOS. ALL RIGHTS RESERVED.{" "}
-          <Link
-            to="/login"
-            className="text-gray-500 hover:text-gray-300 text-sm ml-1 align-baseline"
-          >
-            Staff login
-          </Link>
+          © 2025 SM STUDIOS. ALL RIGHTS RESERVED.
         </p>
       </div>
     </footer>

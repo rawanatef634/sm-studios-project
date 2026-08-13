@@ -14,12 +14,14 @@ export const projects = [
     town: "AL-MAABILAH",
     area: "115 M³",
     designImages: ["/assets/majlis3.png", "/assets/majlis4.png"],
-    story: "Majlis project details coming soon.",
+    story:
+      "A refined gathering space where traditional craft meets contemporary comfort and light.",
     wideImage: "/assets/majlis3.png",
-    approach: "Majlis project details coming soon.",
+    approach:
+      "We balanced traditional majlis hospitality with contemporary materials and lighting to create a warm, inviting gathering space.",
     category: "Interior Design",
   },
-   {
+  {
     id: 2,
     title: "MAITHA BOUTIQUE",
     breadcrumb: "HOME / PROJECTS / MAITHA BOUTIQUE",
@@ -36,7 +38,7 @@ export const projects = [
       "Soft lighting and sculptural display elements create a luxurious shopping atmosphere.",
     category: "Interior Fit-Outs",
   },
-   {
+  {
     id: 3,
     title: "BLUSH SPA",
     breadcrumb: "HOME / PROJECTS / BLUSH SPA",
@@ -58,14 +60,14 @@ export const projects = [
     title: "OFF WHITE",
     breadcrumb: "HOME / PROJECTS / OFF WHITE",
     heroImage: "/assets/offwhite1.jpg",
-    mainImage: "/assets/off white2.jpg",          // renamed to hyphen
+    mainImage: "/assets/off white2.jpg", // renamed to hyphen
     state: "MUSCAT",
     town: "AL-MAABILAH",
     area: "115 M³",
     designImages: ["/assets/off white3.jpg", "/assets/off white4.jpg"], // hyphen
     story:
       "This women’s spa is designed to feel calm and welcoming from the moment you walk in. Soft neutral colors and simple modern details create a peaceful and relaxing atmosphere.",
-    wideImage: "/assets/off white6.jpg",          // hyphen
+    wideImage: "/assets/off white6.jpg", // hyphen
     approach:
       "We focus on creating an elegant environment where every detail enhances the spa experience. Soft lighting, quality materials, and warm tones define the space.",
     category: "Interior Design",

@@ -5,48 +5,75 @@ import {
   useMemo,
   useState,
 } from "react";
-import { projects as seedProjects } from "../data/projectsDetails";
 
-const STORAGE_KEY = "sm-studios-projects";
 const ProjectsContext = createContext(null);
+const API = "/api/projects";
 
 export function ProjectsProvider({ children }) {
-  const [projects, setProjects] = useState(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        return JSON.parse(raw);
-      }
-    } catch {
-      // fall through to seed data
-    }
-    return seedProjects;
-  });
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch projects from the server on mount.
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-  }, [projects]);
+    fetch(API)
+      .then((r) => r.json())
+      .then((data) => setProjects(Array.isArray(data) ? data : []))
+      .catch(() => setProjects([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   /** @param {import("../types/project").Project} newProject */
-  const addProject = (newProject) => {
-    setProjects((prev) => [...prev, newProject]);
+  const addProject = async (newProject) => {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(newProject),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Failed to create project.");
+    }
+    const created = await res.json();
+    setProjects((prev) => [...prev, created]);
+    return created;
   };
 
   /** @param {import("../types/project").Project} updatedProject */
-  const updateProject = (updatedProject) => {
-    setProjects((prev) =>
-      prev.map((p) => (p.id === updatedProject.id ? updatedProject : p)),
-    );
+  const updateProject = async (updatedProject) => {
+    const res = await fetch(API, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(updatedProject),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Failed to update project.");
+    }
+    const saved = await res.json();
+    setProjects((prev) => prev.map((p) => (p.id === saved.id ? saved : p)));
+    return saved;
   };
 
   /** @param {number} id */
-  const deleteProject = (id) => {
+  const deleteProject = async (id) => {
+    const res = await fetch(API, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ id }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Failed to delete project.");
+    }
     setProjects((prev) => prev.filter((p) => p.id !== id));
   };
 
   const value = useMemo(
-    () => ({ projects, addProject, updateProject, deleteProject }),
-    [projects],
+    () => ({ projects, loading, addProject, updateProject, deleteProject }),
+    [projects, loading],
   );
 
   return (

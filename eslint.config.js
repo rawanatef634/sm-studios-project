@@ -6,8 +6,10 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   globalIgnores(['dist']),
+  // Browser / React source files
   {
     files: ['**/*.{js,jsx}'],
+    ignores: ['netlify/functions/**', 'scripts/**'],
     extends: [
       js.configs.recommended,
       reactHooks.configs['recommended-latest'],
@@ -24,6 +26,22 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+  // Node.js server files (Vercel API routes + utility scripts)
+  {
+    files: ['api/**/*.js', 'scripts/**/*.js'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      ecmaVersion: 2022,
+      globals: globals.node,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
     },
   },
 ])

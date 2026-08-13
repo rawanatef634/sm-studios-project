@@ -1,12 +1,98 @@
-# React + Vite
+# SM Studios
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Staff-facing React site for SM Studios project portfolio, with Vercel serverless APIs and Vercel Blob persistence.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Frontend:** React + Vite
+- **Production host:** Vercel
+- **API:** Vercel serverless routes under `/api/*`
+- **Project + image storage:** Vercel Blob (`sm-studios/projects.json`, `sm-studios/images/*`)
+- **Initial seed only:** `src/data/projectsDetails.js` (never auto-replaces an existing Blob document)
 
-## Expanding the ESLint configuration
+## Prerequisites
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Node.js 20+
+- [Vercel CLI](https://vercel.com/docs/cli) (installed as a project `devDependency`)
+
+## Local development
+
+```bash
+npm install
+vercel link          # once — connect this folder to the Vercel project (optional but recommended)
+vercel env pull .env.local
+npm run dev          # Vercel local runtime + Vite (see scripts/run-dev.mjs)
+```
+
+Open the URL printed by the CLI (default `http://localhost:3000`; if that port is busy, Vercel picks the next free port).
+
+For staff login locally you need `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, and `SESSION_SECRET` in `.env.local` (pulled from Vercel or copied from `.env.example`).
+
+`npm run dev` runs the Vercel local runtime (`vercel dev --local`) via `scripts/run-dev.mjs`. That starts the Vite frontend using `devCommand` in `vercel.json` and executes `/api/*` as serverless functions.
+
+> Note: `package.json` cannot set `"dev": "vercel dev"` directly — the Vercel CLI rejects that as recursive invocation. The launcher script is the supported workaround.
+
+Do **not** use plain Vite alone for staff/dashboard work: it serves `/api/*` as static JavaScript source and the dashboard appears empty.
+
+Optional frontend-only Vite (no API execution):
+
+```bash
+npm run dev:vite
+```
+
+### Environment notes
+
+| Variable | Purpose |
+|----------|---------|
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD_HASH` | Staff login |
+| `SESSION_SECRET` | Signed session cookie |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob read/write |
+
+Without `BLOB_READ_WRITE_TOKEN`:
+
+- `/api/projects` uses a **local file-backed** copy of the 10 seed projects from `projectsDetails.js` (`.data/projects.local.json`)
+- Create / edit / delete work for the current `npm run dev` session (shared across API isolates)
+- The local file is cleared when `npm run dev` starts, so you always begin from the seed
+- Blob is **not** read or written
+- Image upload (`/api/upload`) requires a Blob token and will fail without it
+
+With `BLOB_READ_WRITE_TOKEN`:
+
+- Production-like Blob persistence
+- Missing `sm-studios/projects.json` → seed once from `projectsDetails.js`
+- Existing Blob (including empty `[]`) → returned as-is; **never** auto-replaced by the seed
+- Blob auth/network errors → API error (no silent seed fallback)
+
+### Inspect Blob (read-only)
+
+```bash
+npm run blob:inspect
+```
+
+Or open `GET /api/projects-inspect` while `npm run dev` is running.
+
+This reports whether `sm-studios/projects.json` exists and how many projects it contains. It does **not** seed or overwrite anything.
+
+## Production
+
+Deploy on Vercel. Set the env vars in the Vercel project dashboard (or sync via CLI). Build command remains:
+
+```bash
+npm run build
+```
+
+## Scripts
+
+| Script | Command |
+|--------|---------|
+| `npm run dev` | Vercel local runtime + Vite (`scripts/run-dev.mjs`) |
+| `npm run dev:vite` | Vite only (no API handlers) |
+| `npm run build` | Production frontend build |
+| `npm run blob:inspect` | Read-only projects store check |
+| `npm run generate-hash` | Create bcrypt password hash |
+
+## Safety
+
+- Existing Vercel Blob project data is never automatically replaced by `projectsDetails.js`
+- Accidental empty-array writes to a non-empty store are rejected
+- `projectsDetails.js` is the canonical **initial** seed only — do not treat it as the live production database once Blob is seeded

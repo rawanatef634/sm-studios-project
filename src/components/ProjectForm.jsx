@@ -1,13 +1,150 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Upload, X } from "lucide-react";
 
 /** @typedef {import("../types/project").Project} Project */
 
+// ---------------------------------------------------------------------------
+// ImageField — upload a file to /api/upload or paste a URL manually
+// ---------------------------------------------------------------------------
+function ImageField({ label, value, onChange, onUploadStart, onUploadEnd }) {
+  const fileRef = useRef(null);
+  const [localPreview, setLocalPreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  // Clear local preview whenever the parent resets value (e.g. form reset)
+  useEffect(() => {
+    if (!value) setLocalPreview(null);
+  }, [value]);
+
+  const displayed = localPreview || value;
+
+  const handleFile = async (file) => {
+    if (!file) return;
+
+    const objUrl = URL.createObjectURL(file);
+    setLocalPreview(objUrl);
+    setUploadError("");
+    setUploading(true);
+    onUploadStart?.();
+
+    try {
+      // JSON + base64 — multipart bodies arrive empty under vercel-dev.
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("Could not read image file."));
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contentType: file.type,
+          data: dataUrl,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed.");
+      URL.revokeObjectURL(objUrl);
+      setLocalPreview(null);
+      onChange(data.url);
+    } catch (err) {
+      URL.revokeObjectURL(objUrl);
+      setLocalPreview(null);
+      setUploadError(err.message);
+    } finally {
+      setUploading(false);
+      onUploadEnd?.();
+    }
+  };
+
+  return (
+    <div className="grid gap-2">
+      <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+        {label}
+      </span>
+
+      {/* Preview */}
+      {displayed && (
+        <div className="relative w-fit">
+          <img
+            src={displayed}
+            alt=""
+            className="h-20 max-w-[180px] rounded-md object-cover border border-slate-700"
+          />
+          {uploading && (
+            <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/55">
+              <span className="text-xs text-white">Uploading…</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex flex-wrap gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/avif"
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files?.[0]) handleFile(e.target.files[0]);
+            e.target.value = "";
+          }}
+        />
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => fileRef.current?.click()}
+          className="inline-flex items-center gap-1.5 rounded border border-slate-600 px-3 py-1.5 text-xs text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Upload size={12} />
+          {uploading ? "Uploading…" : value ? "Replace" : "Upload image"}
+        </button>
+        {value && !uploading && (
+          <button
+            type="button"
+            onClick={() => {
+              onChange("");
+              setLocalPreview(null);
+              setUploadError("");
+            }}
+            className="inline-flex items-center gap-1 rounded border border-rose-800 px-3 py-1.5 text-xs text-rose-400 transition hover:bg-rose-950"
+          >
+            <X size={12} />
+            Remove
+          </button>
+        )}
+      </div>
+
+      {/* Manual URL fallback — useful for existing /assets/ paths */}
+      <input
+        placeholder="Or paste image URL"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-400 placeholder:text-slate-600"
+      />
+
+      {uploadError && (
+        <p className="text-xs text-rose-400">{uploadError}</p>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ProjectForm
+// ---------------------------------------------------------------------------
 /**
  * @param {{
- * initialProject?: Project | null,
- * onSubmit: (project: Project) => void,
- * onCancel?: () => void,
- * submitLabel?: string
+ *   initialProject?: Project | null,
+ *   onSubmit: (project: Project) => void,
+ *   onCancel?: () => void,
+ *   submitLabel?: string,
+ *   disabled?: boolean,
  * }} props
  */
 export default function ProjectForm({
@@ -15,6 +152,7 @@ export default function ProjectForm({
   onSubmit,
   onCancel,
   submitLabel = "Save",
+  disabled = false,
 }) {
   const [title, setTitle] = useState(initialProject?.title ?? "");
   const [breadcrumb, setBreadcrumb] = useState(initialProject?.breadcrumb ?? "");
@@ -34,6 +172,13 @@ export default function ProjectForm({
   const [wideImage, setWideImage] = useState(initialProject?.wideImage ?? "");
   const [approach, setApproach] = useState(initialProject?.approach ?? "");
 
+  // Track concurrent image uploads to block form submission while any are running
+  const [uploadCount, setUploadCount] = useState(0);
+  const isUploading = uploadCount > 0;
+
+  const onUploadStart = () => setUploadCount((c) => c + 1);
+  const onUploadEnd = () => setUploadCount((c) => Math.max(0, c - 1));
+
   useEffect(() => {
     setTitle(initialProject?.title ?? "");
     setBreadcrumb(initialProject?.breadcrumb ?? "");
@@ -48,7 +193,9 @@ export default function ProjectForm({
     setStory(initialProject?.story ?? "");
     setWideImage(initialProject?.wideImage ?? "");
     setApproach(initialProject?.approach ?? "");
+    setUploadCount(0);
   }, [initialProject]);
+
   const isValid =
     title.trim() &&
     breadcrumb.trim() &&
@@ -59,7 +206,7 @@ export default function ProjectForm({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!isValid) return;
+    if (!isValid || isUploading || disabled) return;
 
     /** @type {Project} */
     const project = {
@@ -81,140 +228,154 @@ export default function ProjectForm({
     onSubmit(project);
   };
 
+  const imageUploadProps = { onUploadStart, onUploadEnd };
+
   return (
     <form onSubmit={handleSubmit} className="grid gap-5 max-w-4xl">
+      {/* Text fields */}
       <div className="grid gap-4 md:grid-cols-2">
         <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Title *</span>
-        <input
-        required
-        placeholder="title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Breadcrumb *</span>
-        <input
-        required
-        placeholder="breadcrumb"
-        value={breadcrumb}
-        onChange={(e) => setBreadcrumb(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Hero Image</span>
-        <input
-        placeholder="heroImage"
-        value={heroImage}
-        onChange={(e) => setHeroImage(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Image</span>
-        <input
-        placeholder="img"
-        value={img}
-        onChange={(e) => setImg(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Main Image</span>
-        <input
-        placeholder="mainImage"
-        value={mainImage}
-        onChange={(e) => setMainImage(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">State *</span>
-        <input
-        required
-        placeholder="state"
-        value={stateField}
-        onChange={(e) => setStateField(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Town *</span>
-        <input
-        required
-        placeholder="town"
-        value={town}
-        onChange={(e) => setTown(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Area *</span>
-        <input
-        required
-        placeholder="area"
-        value={area}
-        onChange={(e) => setArea(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Design Image 1</span>
-        <input
-        placeholder="designImage1"
-        value={designImage1}
-        onChange={(e) => setDesignImage1(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Design Image 2</span>
-        <input
-        placeholder="designImage2"
-        value={designImage2}
-        onChange={(e) => setDesignImage2(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      </div>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Story *</span>
-        <textarea
-        required
-        placeholder="story"
-        value={story}
-        onChange={(e) => setStory(e.target.value)}
-        className="min-h-28 rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <div className="grid gap-4 md:grid-cols-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+            Title *
+          </span>
+          <input
+            required
+            placeholder="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
+          />
+        </label>
         <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Wide Image</span>
-        <input
-        placeholder="wideImage"
-        value={wideImage}
-        onChange={(e) => setWideImage(e.target.value)}
-        className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">Approach</span>
-        <textarea
-        placeholder="approach"
-        value={approach}
-        onChange={(e) => setApproach(e.target.value)}
-        className="min-h-24 rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
-      />
-      </label>
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+            Breadcrumb *
+          </span>
+          <input
+            required
+            placeholder="breadcrumb"
+            value={breadcrumb}
+            onChange={(e) => setBreadcrumb(e.target.value)}
+            className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
+          />
+        </label>
+        <label className="grid gap-1.5">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+            State *
+          </span>
+          <input
+            required
+            placeholder="state"
+            value={stateField}
+            onChange={(e) => setStateField(e.target.value)}
+            className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
+          />
+        </label>
+        <label className="grid gap-1.5">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+            Town *
+          </span>
+          <input
+            required
+            placeholder="town"
+            value={town}
+            onChange={(e) => setTown(e.target.value)}
+            className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
+          />
+        </label>
+        <label className="grid gap-1.5">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+            Area *
+          </span>
+          <input
+            required
+            placeholder="area"
+            value={area}
+            onChange={(e) => setArea(e.target.value)}
+            className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
+          />
+        </label>
       </div>
+
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+          Story *
+        </span>
+        <textarea
+          required
+          placeholder="story"
+          value={story}
+          onChange={(e) => setStory(e.target.value)}
+          className="min-h-28 rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
+        />
+      </label>
+
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+          Approach
+        </span>
+        <textarea
+          placeholder="approach"
+          value={approach}
+          onChange={(e) => setApproach(e.target.value)}
+          className="min-h-24 rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
+        />
+      </label>
+
+      {/* Image fields */}
+      <div className="border-t border-slate-800 pt-4">
+        <p className="mb-4 text-xs uppercase tracking-wider text-slate-500">
+          Images — upload a file or paste a URL
+        </p>
+        <div className="grid gap-6 md:grid-cols-2">
+          <ImageField
+            label="Hero Image"
+            value={heroImage}
+            onChange={setHeroImage}
+            {...imageUploadProps}
+          />
+          <ImageField
+            label="Listing Image (img)"
+            value={img}
+            onChange={setImg}
+            {...imageUploadProps}
+          />
+          <ImageField
+            label="Main Image"
+            value={mainImage}
+            onChange={setMainImage}
+            {...imageUploadProps}
+          />
+          <ImageField
+            label="Wide Image"
+            value={wideImage}
+            onChange={setWideImage}
+            {...imageUploadProps}
+          />
+          <ImageField
+            label="Design Image 1"
+            value={designImage1}
+            onChange={setDesignImage1}
+            {...imageUploadProps}
+          />
+          <ImageField
+            label="Design Image 2"
+            value={designImage2}
+            onChange={setDesignImage2}
+            {...imageUploadProps}
+          />
+        </div>
+      </div>
+
+      {isUploading && (
+        <p className="text-xs text-amber-400">
+          Waiting for image uploads to complete…
+        </p>
+      )}
 
       <div className="mt-2 flex gap-2">
         <button
           type="submit"
-          disabled={!isValid}
+          disabled={!isValid || isUploading || disabled}
           className="rounded-md bg-cyan-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitLabel}

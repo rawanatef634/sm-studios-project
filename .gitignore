@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+# Environment variables — never commit real secrets
+.env
+.env.local
+.env.*.local
+
+# Ephemeral local project store (no Blob token / vercel dev)
+.data/
+
+# Local-only dashboard uploads when BLOB_READ_WRITE_TOKEN is unset
+public/uploads/
+!public/uploads/.gitkeep
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

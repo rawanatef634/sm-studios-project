@@ -1,11 +1,13 @@
 // src/components/OptimizedImage.jsx
-import React, { useMemo } from "react";
+import React from "react";
 
 /**
  * OptimizedImage
- * - Expects original src like "/assets/name.jpg" in public/
- * - Uses generated variants: name-480.jpg, name-800.jpg, name-1200.jpg, name-1600.jpg
- * - Serves WebP when supported
+ * - Local assets ("/assets/name.jpg"): uses generated variants
+ *   name-480/800/1200/1600 (.jpg + .webp) when present
+ * - Remote/blob URLs: renders the original URL as-is (no resize, no variant rewrite)
+ * - Display size is always controlled by the caller's className/container —
+ *   this component does not invent aspect ratios
  */
 export default function OptimizedImage({
   src,
@@ -17,8 +19,31 @@ export default function OptimizedImage({
 }) {
   if (!src) return null;
 
-  // normalize and get base (without extension)
   const [pathOnly] = src.split("?");
+  const isRemote =
+    /^https?:\/\//i.test(pathOnly) || pathOnly.startsWith("//");
+
+  const fillStyle = {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    ...style,
+  };
+
+  // Uploaded / absolute URLs: same fill behavior, original file (no processing)
+  if (isRemote) {
+    return (
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        className={className}
+        style={fillStyle}
+        {...rest}
+      />
+    );
+  }
+
   const normalized = pathOnly.startsWith("/") ? pathOnly.slice(1) : pathOnly;
   const extIndex = normalized.lastIndexOf(".");
   const base = extIndex !== -1 ? normalized.slice(0, extIndex) : normalized;
@@ -28,19 +53,28 @@ export default function OptimizedImage({
   const makeSrcSet = (ext) =>
     widths.map((w) => `/${base}-${w}.${ext} ${w}w`).join(", ");
 
-  const defaultSizes = sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
+  const defaultSizes =
+    sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
 
   return (
-    <picture>
-      <source type="image/webp" srcSet={makeSrcSet("webp")} sizes={defaultSizes} />
-      <source type="image/jpeg" srcSet={makeSrcSet("jpg")} sizes={defaultSizes} />
+    <picture className="block h-full w-full">
+      <source
+        type="image/webp"
+        srcSet={makeSrcSet("webp")}
+        sizes={defaultSizes}
+      />
+      <source
+        type="image/jpeg"
+        srcSet={makeSrcSet("jpg")}
+        sizes={defaultSizes}
+      />
       <img
         src={`/${base}-800.jpg`}
         alt={alt}
         loading="lazy"
         sizes={defaultSizes}
         className={className}
-        style={{ width: "100%", height: "100%", objectFit: "cover", ...style }}
+        style={fillStyle}
         onError={(e) => {
           // fallback to original if optimized missing
           if (e.currentTarget.src !== `/${normalized}`) {

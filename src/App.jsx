@@ -13,6 +13,7 @@ import SingleProject from "./pages/SingleProject";
 import Careers from "./pages/Careers";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
+import StudioEntry from "./pages/StudioEntry";
 import Loader from "./components/Loader.jsx";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -20,7 +21,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   const location = useLocation();
   const isAdminRoute =
-    location.pathname === "/login" || location.pathname.startsWith("/dashboard");
+    location.pathname === "/login" ||
+    location.pathname === "/studio" ||
+    location.pathname.startsWith("/dashboard");
   return (
     <>
       {!isAdminRoute && <Loader pathname={location.pathname} />}
@@ -34,6 +37,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/studio" element={<StudioEntry />} />
         <Route
           path="/dashboard"
           element={

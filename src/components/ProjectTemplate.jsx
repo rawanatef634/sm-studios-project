@@ -50,7 +50,7 @@ export default function ProjectTemplate({ project }) {
           <motion.img
             src={project.mainImage || project.img}
             alt={project.title}
-            className="w-full max-h-[min(90vh,720px)] min-h-[700px] object-contain object-center bg-[#161B1E] shadow-2xl"
+            className="w-full h-[500px] object-contain shadow-2xl md:object-cover"
             whileHover={{ scale: 1.01 }}
             transition={{ duration: 0.4 }}
           />
@@ -64,7 +64,7 @@ export default function ProjectTemplate({ project }) {
           viewport={{ once: true }}
           variants={staggerParent}
         >
-          <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-8 text-white text-xl md:text-2xl font-light">
+          <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-8 text-white text-xl md:text-2xl font-light">
             {[
               { label: "State", value: project.state },
               { label: "Town", value: project.town },
@@ -93,7 +93,7 @@ export default function ProjectTemplate({ project }) {
               <motion.img
                 src={project.designImages[0]}
                 alt="design-left"
-                className="w-full h-[420px] object-contain object-center bg-[#161B1E] shadow-lg"
+                className="w-full h-[420px] object-cover shadow-lg"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
@@ -124,7 +124,7 @@ export default function ProjectTemplate({ project }) {
               <motion.img
                 src={project.designImages[1]} // ✅ fixed index (was 2)
                 alt="design-right"
-                className="w-full h-[420px] object-contain object-center bg-[#161B1E] shadow-lg"
+                className="w-full h-[420px] object-cover shadow-lg"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
@@ -146,7 +146,7 @@ export default function ProjectTemplate({ project }) {
             <img
               src={project.wideImage}
               alt="project-wide"
-              className="w-full min-h-[400px] max-h-[720px] object-contain object-center bg-[#161B1E] shadow-2xl md:min-h-[500px]"
+              className="w-full h-[400px] object-cover shadow-2xl md:h-[600px]"
             />
           </motion.div>
         )}

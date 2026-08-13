@@ -5,12 +5,13 @@ import { useProjects } from "../context/ProjectsContext";
 
 export default function SingleProject() {
   const { id } = useParams();
-  const { projects } = useProjects();
-  const project = projects.find((p) => p.id === Number(id));
+  const { projects, loading } = useProjects();
 
-  if (!project) {
-    return <ProjectNotFound />;
-  }
+  // Avoid flashing "Not Found" while the server response is still in-flight.
+  if (loading) return null;
+
+  const project = projects.find((p) => p.id === Number(id));
+  if (!project) return <ProjectNotFound />;
 
   return <ProjectTemplate project={project} />;
 }

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FolderKanban, LogOut, Pencil, Plus, Trash2, Eye } from "lucide-react";
 import ProjectForm from "../components/ProjectForm";
 import { useProjects } from "../context/ProjectsContext";
@@ -13,31 +13,60 @@ export default function Dashboard() {
   const { projects, addProject, updateProject, deleteProject } = useProjects();
   const [isAdding, setIsAdding] = useState(false);
   const [editingProject, setEditingProject] = useState(/** @type {Project | null} */ (null));
-  const [pendingViewId, setPendingViewId] = useState(null);
   const [projectToDelete, setProjectToDelete] = useState(
     /** @type {Project | null} */ (null),
   );
-
-  useEffect(() => {
-    if (!pendingViewId) return;
-    const exists = projects.some((p) => p.id === pendingViewId);
-    if (!exists) return;
-    navigate(`/projects/${pendingViewId}`);
-    setPendingViewId(null);
-  }, [pendingViewId, projects, navigate]);
+  const [mutating, setMutating] = useState(false);
+  const [mutationError, setMutationError] = useState("");
 
   /** @param {Project} project */
-  const handleCreate = (project) => {
-    addProject(project);
-    setIsAdding(false);
-    setPendingViewId(project.id);
+  const handleCreate = async (project) => {
+    setMutationError("");
+    setMutating(true);
+    try {
+      const created = await addProject(project);
+      setIsAdding(false);
+      navigate(`/projects/${created.id}`);
+    } catch (err) {
+      setMutationError(err.message || "Failed to create project.");
+    } finally {
+      setMutating(false);
+    }
   };
 
   /** @param {Project} project */
-  const handleEditSave = (project) => {
-    updateProject(project);
-    setEditingProject(null);
-    navigate(`/projects/${project.id}`);
+  const handleEditSave = async (project) => {
+    setMutationError("");
+    setMutating(true);
+    try {
+      const saved = await updateProject(project);
+      setEditingProject(null);
+      navigate(`/projects/${saved.id}`);
+    } catch (err) {
+      setMutationError(err.message || "Failed to update project.");
+    } finally {
+      setMutating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!projectToDelete) return;
+    setMutationError("");
+    setMutating(true);
+    try {
+      await deleteProject(projectToDelete.id);
+      setProjectToDelete(null);
+    } catch (err) {
+      setMutationError(err.message || "Failed to delete project.");
+      setProjectToDelete(null);
+    } finally {
+      setMutating(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -62,6 +91,7 @@ export default function Dashboard() {
             <div className="flex gap-2">
               <button
                 onClick={() => {
+                  setMutationError("");
                   setEditingProject(null);
                   setIsAdding(true);
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -72,10 +102,7 @@ export default function Dashboard() {
                 Add Project
               </button>
               <button
-                onClick={() => {
-                  logout();
-                  navigate("/login", { replace: true });
-                }}
+                onClick={handleLogout}
                 className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2 text-white transition hover:bg-white/10"
               >
                 <LogOut size={16} />
@@ -112,6 +139,12 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {mutationError && (
+          <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-950/40 px-4 py-3 text-sm text-rose-400">
+            {mutationError}
+          </div>
+        )}
+
         {(isAdding || editingProject) && (
           <div className="mb-6 rounded-2xl border border-white/10 bg-slate-900 p-4 md:p-6">
             <h2 className="mb-4 text-xl font-semibold text-white">
@@ -123,8 +156,16 @@ export default function Dashboard() {
               onCancel={() => {
                 setIsAdding(false);
                 setEditingProject(null);
+                setMutationError("");
               }}
-              submitLabel={editingProject ? "Save Changes" : "Create Project"}
+              submitLabel={
+                mutating
+                  ? "Saving…"
+                  : editingProject
+                    ? "Save Changes"
+                    : "Create Project"
+              }
+              disabled={mutating}
             />
           </div>
         )}
@@ -160,6 +201,7 @@ export default function Dashboard() {
                     </button>
                     <button
                       onClick={() => {
+                        setMutationError("");
                         setIsAdding(false);
                         setEditingProject(project);
                         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -198,18 +240,17 @@ export default function Dashboard() {
             <div className="mt-5 flex justify-end gap-2">
               <button
                 onClick={() => setProjectToDelete(null)}
-                className="rounded-md border border-slate-600 px-4 py-2 text-slate-100 transition hover:bg-slate-800"
+                disabled={mutating}
+                className="rounded-md border border-slate-600 px-4 py-2 text-slate-100 transition hover:bg-slate-800 disabled:opacity-60"
               >
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  deleteProject(projectToDelete.id);
-                  setProjectToDelete(null);
-                }}
-                className="rounded-md bg-rose-600 px-4 py-2 font-medium text-white transition hover:bg-rose-500"
+                onClick={handleDelete}
+                disabled={mutating}
+                className="rounded-md bg-rose-600 px-4 py-2 font-medium text-white transition hover:bg-rose-500 disabled:opacity-60"
               >
-                Delete
+                {mutating ? "Deleting…" : "Delete"}
               </button>
             </div>
           </div>

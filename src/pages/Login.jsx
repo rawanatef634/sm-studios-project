@@ -5,25 +5,37 @@ import { useAuth } from "../context/AuthContext";
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, isChecking } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Wait for the server session check to finish before deciding what to render.
+  if (isChecking) return null;
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const success = login(username, password);
-    if (!success) {
-      setError("Invalid credentials");
-      return;
+    setSubmitting(true);
+    try {
+      const result = await login(username, password);
+      if (!result.ok) {
+        // Show the rate-limit message verbatim; otherwise use a generic string.
+        setError(
+          result.status === 429 ? result.error : "Invalid credentials.",
+        );
+        return;
+      }
+      const redirectTo = location.state?.from?.pathname || "/dashboard";
+      navigate(redirectTo, { replace: true });
+    } finally {
+      setSubmitting(false);
     }
-    const redirectTo = location.state?.from?.pathname || "/dashboard";
-    navigate(redirectTo, { replace: true });
   };
 
   return (
@@ -46,6 +58,7 @@ export default function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
+              autoComplete="username"
               required
             />
           </label>
@@ -58,15 +71,17 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
+              autoComplete="current-password"
               required
             />
           </label>
           {error && <p className="text-sm text-rose-400">{error}</p>}
           <button
             type="submit"
-            className="mt-1 rounded-md bg-cyan-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-cyan-400"
+            disabled={submitting}
+            className="mt-1 rounded-md bg-cyan-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Sign in
+            {submitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
       </div>
