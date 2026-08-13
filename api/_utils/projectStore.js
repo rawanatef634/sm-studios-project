@@ -12,12 +12,14 @@
  *
  * Safety rules:
  *  A) Missing Blob → seed once from projectsDetails.js, persist, return.
- *  B) Existing Blob → return as-is (never auto-replace with seed).
- *  C) Existing empty Blob → return [] (intentional; do not auto-reseed).
+ *  B) Existing non-empty Blob → return as-is (never auto-replace with seed).
+ *  C) Existing empty Blob → reseed from projectsDetails.js (portfolio must not
+ *     stay blank after a failed first write / empty bootstrap).
  *  D) Refuse accidental empty overwrites of a non-empty store.
- *  E) Blob auth/network failures → throw (never silent seed fallback).
- *  F) No BLOB_READ_WRITE_TOKEN → local file-backed seed copy (temporary;
- *     shared across serverless isolates; cleared when `npm run dev` starts).
+ *  E) Blob auth/network failures → throw (never silent empty array).
+ *  F) No BLOB_READ_WRITE_TOKEN → seed in-memory (+ best-effort local file).
+ *     On Vercel without a token the FS is read-only; still return the seed so
+ *     production never shows zero projects.
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -66,13 +68,13 @@ function writeLocalFile(projects) {
 }
 
 /**
- * Locate the projects.json blob entry (exact pathname preferred).
+ * Locate the projects.json blob entry by exact pathname only.
  * Distinguishes "missing" from "list failed" by throwing on failure.
+ * Never falls back to an unrelated blob under the same prefix.
  */
 async function findProjectsBlob() {
   const { blobs } = await list({ prefix: PROJECTS_PATH });
-  const exact = blobs.find((b) => b.pathname === PROJECTS_PATH);
-  return exact || blobs[0] || null;
+  return blobs.find((b) => b.pathname === PROJECTS_PATH) || null;
 }
 
 /**
@@ -102,17 +104,29 @@ async function snapshotForGuard() {
 // Load
 // ---------------------------------------------------------------------------
 export async function loadProjects() {
-  // No credentials → file-backed seed (never initialize as []).
+  // No credentials → return seed (file write is best-effort only).
   if (!hasBlobToken()) {
-    const existing = readLocalFile();
-    if (existing) return existing;
+    try {
+      const existing = readLocalFile();
+      if (existing && existing.length > 0) return existing;
+    } catch (err) {
+      console.warn("[projectStore] Local store unreadable:", err.message);
+    }
 
     const seed = cloneProjects(seedProjects);
-    writeLocalFile(seed);
-    console.info(
-      `[projectStore] No BLOB_READ_WRITE_TOKEN — seeded local file store from projectsDetails.js (${seed.length} projects). ` +
-        `Path: .data/projects.local.json. Changes are temporary and reset when npm run dev starts.`,
-    );
+    try {
+      writeLocalFile(seed);
+      console.info(
+        `[projectStore] No BLOB_READ_WRITE_TOKEN — seeded local file store from projectsDetails.js (${seed.length} projects). ` +
+          `Path: .data/projects.local.json.`,
+      );
+    } catch (err) {
+      // Vercel serverless FS is read-only outside /tmp — still serve the seed.
+      console.warn(
+        `[projectStore] No BLOB_READ_WRITE_TOKEN and local write failed (${err.message}). ` +
+          `Returning in-memory seed (${seed.length} projects). Set BLOB_READ_WRITE_TOKEN in Vercel for persistence.`,
+      );
+    }
     return seed;
   }
 
@@ -137,7 +151,8 @@ export async function loadProjects() {
     return seed;
   }
 
-  // Rules B & C — object exists → load it; empty array is intentional.
+  // Rule B — non-empty Blob → return as-is.
+  // Rule C — empty Blob → reseed (blank portfolio is never intentional bootstrap).
   try {
     const resp = await fetch(`${blob.url}?t=${Date.now()}`);
     if (!resp.ok) {
@@ -148,12 +163,16 @@ export async function loadProjects() {
       throw new Error("Blob project data is not an array.");
     }
     if (data.length === 0) {
-      console.warn(
-        `[projectStore] ${PROJECTS_PATH} exists but contains 0 projects. Not auto-reseeding.`,
+      const seed = cloneProjects(seedProjects);
+      await persistProjects(seed);
+      console.info(
+        `[projectStore] ${PROJECTS_PATH} was empty — reseeded ${seed.length} projects from projectsDetails.js.`,
       );
+      return seed;
     }
     return data;
   } catch (err) {
+    if (err instanceof ProjectStoreError) throw err;
     console.error("[projectStore] Blob read failed:", err.message);
     throw new ProjectStoreError(
       "Failed to read project store (Blob read error). Seed was not applied.",

@@ -5,21 +5,62 @@ import {
   useMemo,
   useState,
 } from "react";
+import { projects as seedProjects } from "../data/projectsDetails";
 
 const ProjectsContext = createContext(null);
 const API = "/api/projects";
+
+function normalizeProjects(data) {
+  return Array.isArray(data) ? data : null;
+}
 
 export function ProjectsProvider({ children }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch projects from the server on mount.
+  // If the API fails (common when Blob env is missing on Vercel), fall back to
+  // the bundled seed so the public site never shows an empty portfolio.
   useEffect(() => {
+    let cancelled = false;
+
     fetch(API)
-      .then((r) => r.json())
-      .then((data) => setProjects(Array.isArray(data) ? data : []))
-      .catch(() => setProjects([]))
-      .finally(() => setLoading(false));
+      .then(async (r) => {
+        const data = await r.json().catch(() => null);
+        if (!r.ok) {
+          throw new Error(
+            (data && data.error) || `Projects API failed (${r.status})`,
+          );
+        }
+        const list = normalizeProjects(data);
+        if (!list) throw new Error("Projects API returned non-array JSON.");
+        return list;
+      })
+      .then((list) => {
+        if (cancelled) return;
+        if (list.length === 0) {
+          console.warn(
+            "[ProjectsContext] API returned 0 projects — using bundled seed.",
+          );
+          setProjects(seedProjects);
+          return;
+        }
+        setProjects(list);
+      })
+      .catch((err) => {
+        console.warn(
+          "[ProjectsContext] Falling back to bundled seed:",
+          err.message,
+        );
+        if (!cancelled) setProjects(seedProjects);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   /** @param {import("../types/project").Project} newProject */
