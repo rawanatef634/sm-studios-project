@@ -48,6 +48,8 @@ npm run dev:vite
 | `SESSION_SECRET` | Signed session cookie |
 | `SMS_PUBLIC_READ_WRITE_TOKEN` | Preferred Vercel Blob token (public store) |
 | `BLOB_READ_WRITE_TOKEN` | Fallback Blob token (ignored if the public-store token is set) |
+| `RESEND_API_KEY` | Server-only Resend key for Contact (`/api/contact`) and Careers (`/api/careers`) emails |
+| `RESEND_FROM_EMAIL` | Verified From address, e.g. `SM Studios <noreply@smstudios-om.com>` |
 
 Without a Blob token:
 
@@ -65,6 +67,17 @@ With a Blob token:
 - Blob auth/network errors → API error (no silent seed fallback)
 
 The Blob store must be **public**. Project images are public website assets. A private store rejects `access: "public"` writes.
+
+### Contact and Careers email
+
+Form submissions are posted to `/api/contact` and `/api/careers`. Those routes send mail with [Resend](https://resend.com) to `info@smstudios-om.com`. The API key must never be exposed to the browser.
+
+1. Create a Resend API key and add `RESEND_API_KEY` in Vercel Environment Variables (Production, Preview, Development).
+2. Verify the `smstudios-om.com` domain in Resend.
+3. Set `RESEND_FROM_EMAIL` to a verified sender such as `SM Studios <noreply@smstudios-om.com>`.
+4. Pull locally with `vercel env pull .env.local`.
+
+Without `RESEND_API_KEY`, the forms return an error and do not pretend the message was sent. Careers resumes are attached to the email (PDF / DOC / DOCX, max 3.5 MB) and are not stored.
 
 ### Inspect Blob (read-only)
 

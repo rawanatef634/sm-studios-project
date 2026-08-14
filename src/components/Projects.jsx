@@ -1,25 +1,205 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { projects } from "../data/projects";
 import OptimizedImage from "../components/OptimizedImage";
 
+const AUTO_MS = 4500;
+const SLIDE_EASE = [0.22, 1, 0.36, 1];
+const SLIDE_MS = 0.7;
+
+function projectImage(project) {
+  return project.img || project.heroImage || project.mainImage;
+}
+
+function tripleAt(list, i) {
+  const n = list.length;
+  return {
+    left: list[(i - 1 + n) % n],
+    center: list[i],
+    right: list[(i + 1) % n],
+  };
+}
+
+function buildSlides(list) {
+  if (!list.length) return [];
+  const n = list.length;
+  return [
+    { key: "clone-last", ...tripleAt(list, n - 1) },
+    ...list.map((project, i) => ({
+      key: `slide-${project.id}`,
+      ...tripleAt(list, i),
+    })),
+    { key: "clone-first", ...tripleAt(list, 0) },
+  ];
+}
+
+function Caption({ project, fallback = true }) {
+  const text =
+    project.caption ||
+    (fallback
+      ? "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Quisque Egestas Metus Vitae Ipsum."
+      : "");
+  return text;
+}
+
+function DesktopSlide({ left, center, right }) {
+  return (
+    <div className="hidden grid-cols-[0.95fr_1.85fr_0.95fr] items-start gap-6 md:grid">
+      <Link to={`/projects/${left.id}`} className="block">
+        <div className="h-[360px] overflow-hidden">
+          <OptimizedImage
+            src={projectImage(left)}
+            alt={left.title}
+            className="h-full w-full object-cover"
+            sizes="(max-width: 1200px) 26vw, 280px"
+            fill
+          />
+        </div>
+        <p className="pt-2 text-[11px] leading-[1.25] text-[#a1a1a1]">
+          {Caption({ project: left })}
+        </p>
+      </Link>
+
+      <Link to={`/projects/${center.id}`} className="block">
+        <div className="h-[470px] overflow-hidden">
+          <OptimizedImage
+            src={projectImage(center)}
+            alt={center.title}
+            className="h-full w-full object-cover"
+            sizes="(max-width: 1200px) 48vw, 560px"
+            fill
+          />
+        </div>
+        <div className="flex items-start justify-between gap-4 pt-2.5">
+          <h3 className=" text-[42px] leading-[0.95] text-white">
+            {center.title}
+          </h3>
+          <p className="max-w-[230px] pt-2 text-[11px] leading-[1.25] text-[#9c9c9c]">
+            {Caption({ project: center })}
+          </p>
+        </div>
+      </Link>
+
+      <Link to={`/projects/${right.id}`} className="block">
+        <div className="h-[360px] overflow-hidden">
+          <OptimizedImage
+            src={projectImage(right)}
+            alt={right.title}
+            className="h-full w-full object-cover"
+            sizes="(max-width: 1200px) 26vw, 280px"
+            fill
+          />
+        </div>
+        <h3 className="pt-2 text-[44px] leading-[0.95] text-white">
+          {right.title}
+        </h3>
+      </Link>
+    </div>
+  );
+}
+
+function MobileSlide({ center }) {
+  return (
+    <Link to={`/projects/${center.id}`} className="block md:hidden">
+      <div className="h-[320px] overflow-hidden">
+        <OptimizedImage
+          src={projectImage(center)}
+          alt={center.title}
+          className="h-full w-full object-cover"
+          sizes="92vw"
+          fill
+        />
+      </div>
+      <h3 className=" pt-3 text-4xl leading-none text-white">{center.title}</h3>
+      <p className="pt-2 text-xs leading-relaxed text-[#a3a3a3]">
+        {center.caption}
+      </p>
+    </Link>
+  );
+}
+
 export default function PortfolioCarousel() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const prevIndex = (currentIndex - 1 + projects.length) % projects.length;
-  const nextIndex = (currentIndex + 1) % projects.length;
-  const centerProject = projects[currentIndex];
-  const leftProject = projects[prevIndex];
-  const rightProject = projects[nextIndex];
+  const n = projects.length;
+  const slides = buildSlides(projects);
+  const realStart = 1;
+  const realEnd = n;
+  const cloneFirstIndex = n + 1;
+  const cloneLastIndex = 0;
+
+  const [index, setIndex] = useState(realStart);
+  const [instant, setInstant] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const busyRef = useRef(false);
+  const touchX = useRef(null);
+
+  const goTo = useCallback((next) => {
+    if (busyRef.current || n < 2) return;
+    busyRef.current = true;
+    setIndex(next);
+  }, [n]);
 
   const goPrev = useCallback(() => {
-    setCurrentIndex((i) => (i === 0 ? projects.length - 1 : i - 1));
-  }, []);
+    goTo(index - 1);
+  }, [goTo, index]);
 
   const goNext = useCallback(() => {
-    setCurrentIndex((i) => (i === projects.length - 1 ? 0 : i + 1));
-  }, []);
+    goTo(index + 1);
+  }, [goTo, index]);
+
+  const handleAnimationComplete = useCallback(() => {
+    if (index === cloneFirstIndex) {
+      setInstant(true);
+      setIndex(realStart);
+      return;
+    }
+    if (index === cloneLastIndex) {
+      setInstant(true);
+      setIndex(realEnd);
+      return;
+    }
+    busyRef.current = false;
+  }, [index, cloneFirstIndex, cloneLastIndex, realStart, realEnd]);
+
+  useEffect(() => {
+    if (!instant) return;
+    let cancelled = false;
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (cancelled) return;
+        setInstant(false);
+        busyRef.current = false;
+      });
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(id);
+    };
+  }, [instant]);
+
+  useEffect(() => {
+    if (paused || n < 2 || instant) return;
+    if (index === cloneFirstIndex || index === cloneLastIndex) return;
+    const timer = setTimeout(() => {
+      goNext();
+    }, AUTO_MS);
+    return () => clearTimeout(timer);
+  }, [index, paused, n, goNext, instant, cloneFirstIndex, cloneLastIndex]);
+
+  const onTouchStart = (event) => {
+    touchX.current = event.touches[0].clientX;
+  };
+
+  const onTouchEnd = (event) => {
+    if (touchX.current == null) return;
+    const dx = event.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) < 50) return;
+    if (dx < 0) goNext();
+    else goPrev();
+  };
 
   return (
     <section className="bg-[linear-gradient(90deg,#1a242b_0%,#131a1f_40%,#101418_100%)]  text-white">
@@ -63,95 +243,36 @@ export default function PortfolioCarousel() {
           </div>
         </div>
 
-        {/* Desktop replica: 3-card composition */}
-        <div className="hidden grid-cols-[0.95fr_1.85fr_0.95fr] items-start gap-6 md:grid">
-          <Link to={`/projects/${leftProject.id}`} className="block">
-            <div className="h-[360px] overflow-hidden">
-              <OptimizedImage
-                src={
-                  leftProject.img ||
-                  leftProject.heroImage ||
-                  leftProject.mainImage
-                }
-                alt={leftProject.title}
-                className="h-full w-full object-cover"
-                sizes="(max-width: 1200px) 26vw, 280px"
-                fill
-              />
-            </div>
-            <p className="pt-2 text-[11px] leading-[1.25] text-[#a1a1a1]">
-              {leftProject.caption ||
-                "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Quisque Egestas Metus Vitae Ipsum."}
-            </p>
-          </Link>
-
-          <Link to={`/projects/${centerProject.id}`} className="block">
-            <div className="h-[470px] overflow-hidden">
-              <OptimizedImage
-                src={
-                  centerProject.img ||
-                  centerProject.heroImage ||
-                  centerProject.mainImage
-                }
-                alt={centerProject.title}
-                className="h-full w-full object-cover"
-                sizes="(max-width: 1200px) 48vw, 560px"
-                fill
-              />
-            </div>
-            <div className="flex items-start justify-between gap-4 pt-2.5">
-              <h3 className=" text-[42px] leading-[0.95] text-white">
-                {centerProject.title}
-              </h3>
-              <p className="max-w-[230px] pt-2 text-[11px] leading-[1.25] text-[#9c9c9c]">
-                {centerProject.caption ||
-                  "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Quisque Egestas Metus Vitae Ipsum."}
-              </p>
-            </div>
-          </Link>
-
-          <Link to={`/projects/${rightProject.id}`} className="block">
-            <div className="h-[360px] overflow-hidden">
-              <OptimizedImage
-                src={
-                  rightProject.img ||
-                  rightProject.heroImage ||
-                  rightProject.mainImage
-                }
-                alt={rightProject.title}
-                className="h-full w-full object-cover"
-                sizes="(max-width: 1200px) 26vw, 280px"
-                fill
-              />
-            </div>
-            <h3 className="pt-2 text-[44px] leading-[0.95] text-white">
-              {rightProject.title}
-            </h3>
-          </Link>
+        <div
+          className="overflow-hidden"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          <motion.div
+            className="flex will-change-transform"
+            initial={false}
+            animate={{ x: `${-index * 100}%` }}
+            transition={
+              instant
+                ? { duration: 0 }
+                : { duration: SLIDE_MS, ease: SLIDE_EASE }
+            }
+            onAnimationComplete={handleAnimationComplete}
+          >
+            {slides.map((slide) => (
+              <div key={slide.key} className="min-w-full shrink-0 grow-0 basis-full">
+                <DesktopSlide
+                  left={slide.left}
+                  center={slide.center}
+                  right={slide.right}
+                />
+                <MobileSlide center={slide.center} />
+              </div>
+            ))}
+          </motion.div>
         </div>
-
-        {/* Mobile fallback */}
-        <Link to={`/projects/${centerProject.id}`} className="block md:hidden">
-          <div className="h-[320px] overflow-hidden">
-            <OptimizedImage
-              src={
-                centerProject.img ||
-                centerProject.heroImage ||
-                centerProject.mainImage
-              }
-              alt={centerProject.title}
-              className="h-full w-full object-cover"
-              sizes="92vw"
-              fill
-            />
-          </div>
-          <h3 className=" pt-3 text-4xl leading-none text-white">
-            {centerProject.title}
-          </h3>
-          <p className="pt-2 text-xs leading-relaxed text-[#a3a3a3]">
-            {centerProject.caption}
-          </p>
-        </Link>
       </div>
     </section>
   );

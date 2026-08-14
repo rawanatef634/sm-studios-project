@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import emailjs from "emailjs-com";
 import HeroSection from "../components/HeroSection";
 import Footer from "../components/Footer";
 
@@ -43,10 +42,11 @@ const Careers = () => {
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
+    const allowedExt = /\.(pdf|doc|docx)$/i;
     if (
       selected &&
-      ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"].includes(selected.type) &&
-      selected.size <= 10 * 1024 * 1024
+      allowedExt.test(selected.name) &&
+      selected.size <= 3.5 * 1024 * 1024
     ) {
       setFile(selected);
       setStatus("");
@@ -55,12 +55,15 @@ const Careers = () => {
       }
     } else {
       setFile(null);
-      setStatus("Invalid file. Only .pdf, .doc, .docx under 10MB allowed.");
+      e.target.value = "";
+      setStatus("Invalid file. Only .pdf, .doc, .docx under 3.5MB allowed.");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     const validationErrors = validate();
     setErrors(validationErrors);
 
@@ -69,28 +72,30 @@ const Careers = () => {
       setStatus("");
 
       try {
-        // Send notification email without attachment
-        await emailjs.send(
-          "service_41tcyx3",
-          "template_12trddm",
-          {
-            to_email: "info@smstudios-om.com",
-            from_name: form.name,
-            from_email: form.email,
-            phone: form.phone,
-            position: form.position,
-            message: form.message,
-            fileName: file.name,
-            fileSize: (file.size / 1024).toFixed(2) + " KB",
-            instruction: `Please reply to ${form.email} to request their resume file: ${file.name}`
-          },
-          "86X4kGg_jxE-O56Ty"
-        );
+        const payload = new FormData();
+        payload.append("name", form.name);
+        payload.append("email", form.email);
+        payload.append("phone", form.phone);
+        payload.append("position", form.position);
+        payload.append("message", form.message);
+        payload.append("resume", file, file.name);
 
-        setStatus(`Application received! ✅ We'll contact you at ${form.email} to request your resume.`);
-        setIsSubmitting(false);
-        
-        // Reset form
+        const res = await fetch("/api/careers", {
+          method: "POST",
+          body: payload,
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.ok) {
+          if (data.errors) setErrors((prev) => ({ ...prev, ...data.errors }));
+          setStatus(
+            data.error ||
+              "Failed to submit. Please email your resume directly to info@smstudios-om.com ❌",
+          );
+          return;
+        }
+
+        setStatus("Application sent successfully ✅");
         setForm({
           name: "",
           email: "",
@@ -99,10 +104,14 @@ const Careers = () => {
           message: "",
         });
         setFile(null);
-      } catch (error) {
-        setStatus("Failed to submit. Please email your resume directly to info@smstudios-om.com ❌");
+        const input = document.getElementById("resume-upload");
+        if (input) input.value = "";
+      } catch {
+        setStatus(
+          "Failed to submit. Please email your resume directly to info@smstudios-om.com ❌",
+        );
+      } finally {
         setIsSubmitting(false);
-        console.error("EmailJS Error:", error);
       }
     }
   };
@@ -234,12 +243,13 @@ const Careers = () => {
                 <p className="text-gray-300 mb-2 md:text-[26px]">
                   Drag your resume here or click to upload
                 </p>
-                <p className="md:text-[16px] text-gray-300">Use a pdf, docx, or doc (Max 10MB)</p>
+                <p className="md:text-[16px] text-gray-300">Use a pdf, docx, or doc (Max 3.5MB)</p>
               </label>
 
               <input
                 id="resume-upload"
                 type="file"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 className="hidden"
                 onChange={handleFileChange}
                 disabled={isSubmitting}

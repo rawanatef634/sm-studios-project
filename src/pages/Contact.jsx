@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import emailjs from "emailjs-com";
 import HeroSection from "../components/HeroSection";
 import Footer from "../components/Footer";
 
@@ -44,8 +43,10 @@ const Contact = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     const validationErrors = validate();
     setErrors(validationErrors);
 
@@ -53,44 +54,35 @@ const Contact = () => {
       setIsSubmitting(true);
       setStatus("");
 
-      // EmailJS configuration
-      emailjs
-        .send(
-          "service_41tcyx3",     
-          "template_12trddm",   
-          {
-            to_email: "info@smstudios-om.com", 
-            from_name: form.name,
-            from_email: form.email,
-            phone: form.phone,
-            project: form.project,
-            location: form.location,
-            area: form.area,
-            requirements: form.requirements,
-          },
-          "86X4kGg_jxE-O56Ty"     // Your Public Key
-        )
-        .then(
-          () => {
-            setStatus("Message sent successfully ✅");
-            setIsSubmitting(false);
-            // Reset form after successful submission
-            setForm({
-              name: "",
-              email: "",
-              phone: "",
-              project: "",
-              location: "",
-              area: "",
-              requirements: "",
-            });
-          },
-          (error) => {
-            setStatus("Something went wrong ❌");
-            setIsSubmitting(false);
-            console.error("EmailJS Error:", error);
-          }
-        );
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.ok) {
+          if (data.errors) setErrors(data.errors);
+          setStatus(data.error || "Something went wrong ❌");
+          return;
+        }
+
+        setStatus("Message sent successfully ✅");
+        setForm({
+          name: "",
+          email: "",
+          phone: "",
+          project: "",
+          location: "",
+          area: "",
+          requirements: "",
+        });
+      } catch {
+        setStatus("Something went wrong ❌");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 

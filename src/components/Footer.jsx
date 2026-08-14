@@ -1,6 +1,6 @@
-import { Facebook, Instagram, Youtube, ArrowUp } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { Link } from "react-router-dom";
-import WhatsAppIcon from "./icons/WhatsAppIcon";
+import SocialLinks from "./SocialLinks";
 
 export default function Footer() {
   return (
@@ -65,32 +65,11 @@ export default function Footer() {
             <p className="text-md text-gray-300 mb-6">+968 78444636</p>
 
             {/* Social Icons */}
-            <div className="flex gap-6 justify-center md:justify-start">
-              <a
-                href="#"
-                className="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
-              >
-                <WhatsAppIcon className="w-5 h-5" />
-              </a>
-              <a
-                href="https://www.instagram.com/smstudios.om/?hl=en"
-                className="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
-              >
-                <Youtube className="w-5 h-5" />
-              </a>
-            </div>
+            <SocialLinks
+              className="flex gap-6 justify-center md:justify-start"
+              itemClassName="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
+              iconClassName="w-5 h-5"
+            />
           </div>
         </div>
       </div>

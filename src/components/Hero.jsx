@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Facebook, Instagram, Youtube } from "lucide-react";
-import WhatsAppIcon from "./icons/WhatsAppIcon";
+import SocialLinks from "./SocialLinks";
 import OptimizedImage from "./OptimizedImage";
 
 const slides = [
@@ -121,45 +120,11 @@ export default function HeroSection() {
           max-md:flex-col max-md:items-center max-md:left-4 max-md:top-1/2 max-md:-translate-y-1 max-md:bottom-auto
         "
       >
-        <a
-          href="https://www.facebook.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Facebook"
-          className="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
-        >
-          <Facebook className="w-5 h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-80" />
-        </a>
-
-        <a
-          href="https://wa.me/96800000000"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="WhatsApp"
-          className="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
-        >
-          <WhatsAppIcon className="w-5 h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-80" />
-        </a>
-
-        <a
-          href="https://www.instagram.com/smstudios.om/?hl=en"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Instagram"
-          className="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
-        >
-          <Instagram className="w-5 h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-80" />
-        </a>
-
-        <a
-          href="https://www.youtube.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="YouTube"
-          className="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
-        >
-          <Youtube className="w-5 h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-80" />
-        </a>
+        <SocialLinks
+          className="contents"
+          itemClassName="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
+          iconClassName="w-5 h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-80"
+        />
       </div>
 
       {/* === SLIDE NAVIGATION === */}

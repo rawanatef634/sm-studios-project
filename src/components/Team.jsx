@@ -8,31 +8,43 @@ export default function Team() {
       name: "Muhannad Al-Hinai",
       role: "Managing Partner | CEO",
       image: "/assets/Muhannad Al-Hinai.png",
+      objectPosition: "center 18%",
+      scale: 1.1,
     },
     {
       name: "Mohammed Al-Habsi",
       role: "Co-Founder | CFO",
       image: "/assets/Mohammed Al-Habsi.png",
+      objectPosition: "center 18%",
+      scale: 1.1,
     },
     {
       name: "Talal Alhabsi",
       role: "Site Supervisor",
       image: "/assets/Talal Alhabsi.jpeg",
+      objectPosition: "center 18%",
+      scale: 1.85,
     },
     {
       name: "Hamida",
       role: "Senior Interior Engineer",
       image: "/assets/Reemi Mahoudh.jpeg",
+      objectPosition: "center 14%",
+      scale: 1.95,
     },
     {
       name: "Basith",
       role: "Senior Interior Engineer",
       image: "/assets/Abdulbasith.jpeg",
+      objectPosition: "center 12%",
+      scale: 2.05,
     },
     {
       name: "Rayan",
       role: "Graphic Designer",
       image: "/assets/Raiyan Eltoqi.jpeg",
+      objectPosition: "center 14%",
+      scale: 1.95,
     },
   ];
 
@@ -91,7 +103,12 @@ export default function Team() {
                 <img
                   src={member.image}
                   alt={member.name}
-                  className="w-full h-full object-cover object-[center_18%] scale-110"
+                  className="w-full h-full object-cover"
+                  style={{
+                    objectPosition: member.objectPosition,
+                    transform: `scale(${member.scale})`,
+                    transformOrigin: member.objectPosition,
+                  }}
                 />
               </div>
 
