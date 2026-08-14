@@ -46,7 +46,7 @@ const Careers = () => {
     if (
       selected &&
       allowedExt.test(selected.name) &&
-      selected.size <= 3.5 * 1024 * 1024
+      selected.size <= 3 * 1024 * 1024
     ) {
       setFile(selected);
       setStatus("");
@@ -56,7 +56,7 @@ const Careers = () => {
     } else {
       setFile(null);
       e.target.value = "";
-      setStatus("Invalid file. Only .pdf, .doc, .docx under 3.5MB allowed.");
+      setStatus("Invalid file. Only .pdf, .doc, .docx under 3MB allowed.");
     }
   };
 
@@ -72,17 +72,27 @@ const Careers = () => {
       setStatus("");
 
       try {
-        const payload = new FormData();
-        payload.append("name", form.name);
-        payload.append("email", form.email);
-        payload.append("phone", form.phone);
-        payload.append("position", form.position);
-        payload.append("message", form.message);
-        payload.append("resume", file, file.name);
+        const resumeData = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ""));
+          reader.onerror = () => reject(reader.error || new Error("Could not read resume"));
+          reader.readAsDataURL(file);
+        });
 
         const res = await fetch("/api/careers", {
           method: "POST",
-          body: payload,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            position: form.position,
+            message: form.message,
+            resume: {
+              filename: file.name,
+              data: resumeData,
+            },
+          }),
         });
         const data = await res.json().catch(() => ({}));
 
@@ -243,7 +253,7 @@ const Careers = () => {
                 <p className="text-gray-300 mb-2 md:text-[26px]">
                   Drag your resume here or click to upload
                 </p>
-                <p className="md:text-[16px] text-gray-300">Use a pdf, docx, or doc (Max 3.5MB)</p>
+                <p className="md:text-[16px] text-gray-300">Use a pdf, docx, or doc (Max 3MB)</p>
               </label>
 
               <input

@@ -44,6 +44,13 @@ export function getResend() {
  */
 export async function sendStudioEmail(payload) {
   const resend = getResend();
+  const attachments = payload.attachments?.map((attachment) => ({
+    filename: attachment.filename,
+    contentType: attachment.contentType,
+    content: Buffer.isBuffer(attachment.content)
+      ? attachment.content.toString("base64")
+      : attachment.content,
+  }));
   const { data, error } = await resend.emails.send({
     from: getFromAddress(),
     to: CONTACT_TO,
@@ -51,7 +58,7 @@ export async function sendStudioEmail(payload) {
     html: payload.html,
     text: payload.text,
     replyTo: payload.replyTo || undefined,
-    attachments: payload.attachments,
+    attachments,
   });
 
   if (error) {

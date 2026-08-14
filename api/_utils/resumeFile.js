@@ -1,4 +1,14 @@
-export const MAX_RESUME_BYTES = Math.floor(3.5 * 1024 * 1024);
+/** 3 MB binary ≈ 4 MB base64 — stays under Vercel’s ~4.5 MB body limit. */
+export const MAX_RESUME_BYTES = 3 * 1024 * 1024;
+
+export function decodeBase64Payload(data) {
+  const trimmed = String(data || "").trim();
+  const match = /^data:([^;]+);base64,(.+)$/i.exec(trimmed);
+  if (match) {
+    return Buffer.from(match[2], "base64");
+  }
+  return Buffer.from(trimmed, "base64");
+}
 
 const PDF_MAGIC = Buffer.from("%PDF", "ascii");
 const OLE_MAGIC = Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
@@ -32,7 +42,7 @@ export function detectResumeKind(buffer, filename = "") {
   if (buffer.length > MAX_RESUME_BYTES) {
     return {
       ok: false,
-      error: "Resume is too large. Maximum size is 3.5 MB.",
+      error: "Resume is too large. Maximum size is 3 MB.",
     };
   }
 

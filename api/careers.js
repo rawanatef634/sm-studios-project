@@ -1,4 +1,3 @@
-import Busboy from "busboy";
 import {
   CONTACT_TO,
   MailConfigError,
@@ -6,6 +5,7 @@ import {
   rowsToText,
   sendStudioEmail,
 } from "./_utils/mail.js";
+import { readJsonBody } from "./_utils/auth.js";
 import {
   CAREER_LIMITS,
   isValidEmail,
@@ -13,18 +13,13 @@ import {
 } from "./_utils/formLimits.js";
 import {
   MAX_RESUME_BYTES,
+  decodeBase64Payload,
   detectResumeKind,
   safeResumeFilename,
 } from "./_utils/resumeFile.js";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 const attempts = new Map();
-const MAX_ATTEMPTS = 8;
+const MAX_ATTEMPTS = 20;
 const WINDOW_MS = 15 * 60 * 1000;
 
 function getClientIp(req) {
@@ -47,75 +42,12 @@ function checkRateLimit(ip) {
   return true;
 }
 
-function readRawBody(req) {
-  if (Buffer.isBuffer(req.body)) return Promise.resolve(req.body);
-  if (typeof req.body === "string") return Promise.resolve(Buffer.from(req.body));
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    req.on("data", (chunk) => chunks.push(chunk));
-    req.on("end", () => resolve(Buffer.concat(chunks)));
-    req.on("error", reject);
-  });
-}
-
-async function parseMultipart(req) {
-  const contentType = req.headers["content-type"] || "";
-  if (!/multipart\/form-data/i.test(contentType)) {
-    const err = new Error("Expected multipart form data.");
-    err.status = 400;
-    throw err;
-  }
-
-  const raw = await readRawBody(req);
-
-  return new Promise((resolve, reject) => {
-    const bb = Busboy({
-      headers: req.headers,
-      limits: {
-        files: 1,
-        fileSize: MAX_RESUME_BYTES,
-        fields: 10,
-        fieldSize: 20 * 1024,
-      },
-    });
-
-    const fields = {};
-    let fileBuffer = null;
-    let filename = "";
-    let truncated = false;
-
-    bb.on("field", (name, value) => {
-      fields[name] = value;
-    });
-
-    bb.on("file", (_name, file, info) => {
-      filename = info.filename || "";
-      const chunks = [];
-      file.on("data", (chunk) => chunks.push(chunk));
-      file.on("limit", () => {
-        truncated = true;
-        file.resume();
-      });
-      file.on("end", () => {
-        fileBuffer = Buffer.concat(chunks);
-      });
-    });
-
-    bb.on("error", reject);
-    bb.on("finish", () => {
-      resolve({ fields, fileBuffer, filename, truncated });
-    });
-
-    bb.end(raw);
-  });
-}
-
-function validateCareer(fields) {
-  const name = trimStr(fields?.name, CAREER_LIMITS.name);
-  const email = trimStr(fields?.email, CAREER_LIMITS.email).toLowerCase();
-  const phone = trimStr(fields?.phone, CAREER_LIMITS.phone);
-  const position = trimStr(fields?.position, CAREER_LIMITS.position);
-  const message = trimStr(fields?.message, CAREER_LIMITS.message);
+function validateCareer(body) {
+  const name = trimStr(body?.name, CAREER_LIMITS.name);
+  const email = trimStr(body?.email, CAREER_LIMITS.email).toLowerCase();
+  const phone = trimStr(body?.phone, CAREER_LIMITS.phone);
+  const position = trimStr(body?.position, CAREER_LIMITS.position);
+  const message = trimStr(body?.message, CAREER_LIMITS.message);
 
   const errors = {};
   if (!name) errors.name = "Full Name is required";
@@ -132,6 +64,14 @@ function validateCareer(fields) {
   };
 }
 
+function safeProviderMessage(message) {
+  const text = String(message || "");
+  if (/api[_-]?key|authorization|bearer|secret/i.test(text)) {
+    return "";
+  }
+  return text.slice(0, 240);
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -144,16 +84,14 @@ export default async function handler(req, res) {
     });
   }
 
-  let parsedForm;
+  let body;
   try {
-    parsedForm = await parseMultipart(req);
-  } catch (err) {
-    return res.status(err.status || 400).json({
-      error: err.message || "Invalid form submission.",
-    });
+    body = await readJsonBody(req);
+  } catch {
+    return res.status(400).json({ error: "Invalid request body." });
   }
 
-  const parsed = validateCareer(parsedForm.fields);
+  const parsed = validateCareer(body);
   if (!parsed.ok) {
     return res.status(400).json({
       error: "Please correct the highlighted fields.",
@@ -161,20 +99,42 @@ export default async function handler(req, res) {
     });
   }
 
-  if (parsedForm.truncated) {
-    return res.status(413).json({
-      error: "Resume is too large. Maximum size is 3.5 MB.",
-    });
-  }
+  const resumeMeta = body?.resume && typeof body.resume === "object" ? body.resume : {};
+  const resumeData = resumeMeta.data || body?.resumeData;
+  const resumeName = resumeMeta.filename || body?.resumeFilename || "resume";
 
-  if (!parsedForm.fileBuffer || !parsedForm.fileBuffer.length) {
+  if (!resumeData || typeof resumeData !== "string") {
     return res.status(400).json({
       error: "Please upload your resume",
       errors: { file: "Please upload your resume" },
     });
   }
 
-  const kind = detectResumeKind(parsedForm.fileBuffer, parsedForm.filename);
+  let fileBuffer;
+  try {
+    fileBuffer = decodeBase64Payload(resumeData);
+  } catch {
+    return res.status(400).json({
+      error: "The resume file is empty or unreadable.",
+      errors: { file: "The resume file is empty or unreadable." },
+    });
+  }
+
+  if (!fileBuffer.length) {
+    return res.status(400).json({
+      error: "Please upload your resume",
+      errors: { file: "Please upload your resume" },
+    });
+  }
+
+  if (fileBuffer.length > MAX_RESUME_BYTES) {
+    return res.status(413).json({
+      error: "Resume is too large. Maximum size is 3 MB.",
+      errors: { file: "Resume is too large. Maximum size is 3 MB." },
+    });
+  }
+
+  const kind = detectResumeKind(fileBuffer, resumeName);
   if (!kind.ok) {
     const status = /too large/i.test(kind.error) ? 413 : 415;
     return res.status(status).json({
@@ -184,7 +144,7 @@ export default async function handler(req, res) {
   }
 
   const { name, email, phone, position, message } = parsed.fields;
-  const filename = safeResumeFilename(parsedForm.filename, kind.ext);
+  const filename = safeResumeFilename(resumeName, kind.ext);
   const title = "NEW CAREER APPLICATION";
   const rows = [
     ["Name", name],
@@ -204,7 +164,7 @@ export default async function handler(req, res) {
       attachments: [
         {
           filename,
-          content: parsedForm.fileBuffer,
+          content: fileBuffer.toString("base64"),
           contentType: kind.contentType,
         },
       ],
@@ -217,10 +177,13 @@ export default async function handler(req, res) {
     console.error("[careers] send failed:", err.message || err);
     const tooLarge =
       /too large|maximum|payload|413|attachment/i.test(err.message || "");
+    const provider = safeProviderMessage(err.message);
     return res.status(err.status || 502).json({
       error: tooLarge
         ? "The resume could not be sent because of size limits. Please email a smaller PDF to info@smstudios-om.com."
-        : `Could not send your application to ${CONTACT_TO}. Please try again or email that address directly.`,
+        : provider
+          ? `Could not send your application: ${provider}`
+          : `Could not send your application to ${CONTACT_TO}. Please try again or email that address directly.`,
     });
   }
 }

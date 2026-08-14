@@ -77,7 +77,7 @@ Form submissions are posted to `/api/contact` and `/api/careers`. Those routes s
 3. Set `RESEND_FROM_EMAIL` to a verified sender such as `SM Studios <noreply@smstudios-om.com>`.
 4. Pull locally with `vercel env pull .env.local`.
 
-Without `RESEND_API_KEY`, the forms return an error and do not pretend the message was sent. Careers resumes are attached to the email (PDF / DOC / DOCX, max 3.5 MB) and are not stored.
+Without `RESEND_API_KEY`, the forms return an error and do not pretend the message was sent. Careers resumes are attached to the email (PDF / DOC / DOCX, max 3 MB) and are not stored.
 
 ### Inspect Blob (read-only)
 
