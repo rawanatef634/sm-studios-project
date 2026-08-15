@@ -5,7 +5,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative bg-[#0f1113] text-white w-full md:max-w-[2205px] md:h-[982px] mx-auto overflow-hidden my-10"
+      className="relative bg-[#0f1113] text-white w-full md:max-w-[1512px] md:h-[982px] mx-auto overflow-hidden my-10"
     >
       {/* Subtle grid pattern (Figma-style background) */}
       <div
@@ -39,17 +39,19 @@ export default function About() {
           viewport={{ once: true }}
         >
           <motion.h2
-            className="font-semibold text-[28px] leading-[36px] md:text-[40px] md:leading-[60px] font-['El_Messiri'] uppercase text-center md:text-left"
+            className="font-['El_Messiri'] font-semibold text-[28px] leading-[36px] md:text-[40px] md:leading-[60px] uppercase text-center md:text-left"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut', delay: 0.3 }}
             viewport={{ once: true }}
           >
-            WE CREATE INTERIORS <br /> WITH PRECISION.
+            WE CREATE INTERIORS WITH
+            <br />
+            PRECISION.
           </motion.h2>
 
           <motion.p
-            className=" text-[16px] text-gray-400  leading-[28px] md:text-[26px] md:leading-[40px] font-light text-center md:text-left"
+            className=" text-[16px] text-gray-400  leading-[28px] md:text-[26px] md:leading-[40px] font-['El_Messiri'] font-light text-center md:text-left"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut', delay: 0.4 }}

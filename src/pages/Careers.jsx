@@ -143,7 +143,7 @@ const Careers = () => {
           viewport={{ once: true }}
           variants={fadeUp}
         >
-          <p className="max-w-6xl mx-auto text-[32px]">
+          <p className="max-w-6xl mx-auto text-[32px] font-['El_Messiri'] font-light">
             We don't have any open positions right now, but we'd love to stay connected.  
             You can send us your CV and we'll reach out when opportunities arise.
           </p>
@@ -288,7 +288,7 @@ const Careers = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="cursor-pointer text-xl bg-white text-black px-8 py-3 rounded-md hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer text-xl bg-white text-black px-8 py-3 font-['El_Messiri'] tracking-[0.08em] hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "SUBMITTING..." : "SUBMIT APPLICATION"}
               </button>

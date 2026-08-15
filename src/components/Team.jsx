@@ -53,7 +53,7 @@ export default function Team() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading */}
         <motion.p
-          className="uppercase tracking-wide text-md text-gray-500 mb-2"
+          className="uppercase tracking-[0.16em] text-sm font-['El_Messiri'] text-[#8b9199] mb-2"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -63,7 +63,7 @@ export default function Team() {
         </motion.p>
 
         <motion.h2
-          className="text-3xl md:text-4xl font-semibold text-gray-900 mb-12"
+          className="font-['El_Messiri'] text-3xl md:text-4xl font-semibold text-gray-900 mb-12 max-w-3xl"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
@@ -91,7 +91,7 @@ export default function Team() {
           {teamMembers.map((member) => (
             <motion.div
               key={member.name}
-              className="group text-center w-60 sm:w-60 duration-500 delay-150 hover:bg-black"
+              className="group text-center w-60 sm:w-60"
               variants={{
                 hidden: { opacity: 0, y: 60 },
                 visible: { opacity: 1, y: 0 },
@@ -99,7 +99,7 @@ export default function Team() {
               transition={{ duration: 0.7, ease: "easeOut" }}
             >
               {/* Image — tighter crop (closer portrait) */}
-              <div className="w-60 h-60 mx-auto mb-4 overflow-hidden shadow-md">
+              <div className="w-60 h-60 mx-auto mb-6 overflow-hidden rounded-t-[12px]">
                 <img
                   src={member.image}
                   alt={member.name}
@@ -114,10 +114,16 @@ export default function Team() {
 
               {/* Text */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 transition-colors duration-500 delay-150 group-hover:text-white">
-                  {member.name}
+                <h3 className="text-lg font-['El_Messiri'] text-gray-900">
+                  <span className="font-bold">{member.name.split(" ")[0]}</span>
+                  {member.name.split(" ").length > 1 && (
+                    <span className="font-normal">
+                      {" "}
+                      {member.name.split(" ").slice(1).join(" ")}
+                    </span>
+                  )}
                 </h3>
-                <p className="mb-4 text-sm text-gray-600 transition-colors duration-500 delay-200 group-hover:text-white">
+                <p className="mb-4 mt-1 text-sm font-['El_Messiri'] text-gray-500">
                   {member.role}
                 </p>
               </div>

@@ -36,7 +36,7 @@ export default function ProjectsPage() {
       {/* LATEST PROJECTS */}
       <section className="bg-[#161B1E] py-20">
         <div className="max-w-6xl mx-auto px-6 md:px-10">
-          <h2 className="text-4xl font-semibold mb-10 text-center text-white">
+          <h2 className="font-['El_Messiri'] text-4xl font-semibold mb-10 text-center text-white">
             Latest Projects
           </h2>
 

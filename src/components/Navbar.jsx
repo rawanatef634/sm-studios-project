@@ -38,13 +38,17 @@ const Navbar = () => {
         <Link to="/" className="flex items-center">
           <img src="/assets/sm-logo.png" alt="Logo" className="h-10 w-auto" />
           <div className="block">
-            <h1 className="px-2 text-white text-lg">SM STUDIO</h1>
-            <h2 className="px-2 text-white text-md">+PARTNERS</h2>
+            <h1 className="px-2 text-white text-lg font-['El_Messiri'] tracking-[0.04em]">
+              SM STUDIO
+            </h1>
+            <h2 className="px-2 text-white text-[11px] font-['El_Messiri'] tracking-[0.18em]">
+              +PARTNERS
+            </h2>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-10 text-white text-sm font-sans tracking-wide uppercase">
+        <nav className="hidden md:flex items-center space-x-10 text-white text-sm font-['El_Messiri'] tracking-[0.14em] uppercase">
           <Link to="/projects" className="hover:opacity-80 transition">
             Projects
           </Link>
@@ -53,7 +57,7 @@ const Navbar = () => {
           <div className="relative" ref={dropdownRef}>
             <div
               onClick={() => setDesktopServicesOpen((prev) => !prev)}
-              className="hover:opacity-80 transition flex items-center space-x-1 cursor-pointer text-md font-sans tracking-wide uppercase"
+              className="hover:opacity-80 transition flex items-center space-x-1 cursor-pointer"
             >
               <span>Services</span>
               <svg
@@ -158,7 +162,7 @@ const Navbar = () => {
       {/* Mobile dropdown menu */}
       {mobileOpen && (
         <div className="md:hidden bg-[#161B1E]/95 backdrop-blur border-t border-white/10">
-          <nav className="px-8 py-4 flex flex-col space-y-4 text-white text-sm font-sans tracking-wide uppercase">
+          <nav className="px-8 py-4 flex flex-col space-y-4 text-white text-sm font-['El_Messiri'] tracking-[0.14em] uppercase">
             <Link
               to="/projects"
               className="hover:opacity-80 transition"

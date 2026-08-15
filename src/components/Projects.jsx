@@ -58,7 +58,7 @@ function DesktopSlide({ left, center, right }) {
             fill
           />
         </div>
-        <p className="pt-2 text-[11px] leading-[1.25] text-[#a1a1a1]">
+        <p className="pt-2 font-['El_Messiri'] text-[11px] leading-[1.25] text-[#a1a1a1]">
           {Caption({ project: left })}
         </p>
       </Link>
@@ -74,10 +74,10 @@ function DesktopSlide({ left, center, right }) {
           />
         </div>
         <div className="flex items-start justify-between gap-4 pt-2.5">
-          <h3 className=" text-[42px] leading-[0.95] text-white">
+          <h3 className="font-['El_Messiri'] text-[42px] leading-[0.95] text-white">
             {center.title}
           </h3>
-          <p className="max-w-[230px] pt-2 text-[11px] leading-[1.25] text-[#9c9c9c]">
+          <p className="max-w-[230px] pt-2 font-['El_Messiri'] text-[11px] leading-[1.25] text-[#9c9c9c]">
             {Caption({ project: center })}
           </p>
         </div>
@@ -93,7 +93,7 @@ function DesktopSlide({ left, center, right }) {
             fill
           />
         </div>
-        <h3 className="pt-2 text-[44px] leading-[0.95] text-white">
+        <h3 className="pt-2 font-['El_Messiri'] text-[44px] leading-[0.95] text-white">
           {right.title}
         </h3>
       </Link>
@@ -113,8 +113,8 @@ function MobileSlide({ center }) {
           fill
         />
       </div>
-      <h3 className=" pt-3 text-4xl leading-none text-white">{center.title}</h3>
-      <p className="pt-2 text-xs leading-relaxed text-[#a3a3a3]">
+      <h3 className="font-['El_Messiri'] pt-3 text-4xl leading-none text-white">{center.title}</h3>
+      <p className="pt-2 font-['El_Messiri'] text-xs leading-relaxed text-[#a3a3a3]">
         {center.caption}
       </p>
     </Link>
@@ -202,21 +202,21 @@ export default function PortfolioCarousel() {
   };
 
   return (
-    <section className="bg-[linear-gradient(90deg,#1a242b_0%,#131a1f_40%,#101418_100%)]  text-white">
+    <section className="bg-[#111111]  text-white">
       <div className="mx-auto w-full max-w-8xl pb-12 pt-11 md:pb-16 md:pt-12">
         <div className="mb-10 px-4 md:px-20 flex items-start justify-between gap-6 md:mb-12">
           <div className="max-w-[40rem] ">
-            <p className="mb-3 text-[16px] font-bold uppercase tracking-[0.16em] text-white">
+            <p className="mb-3 font-['El_Messiri'] text-[16px] font-medium uppercase tracking-[0.16em] text-white">
               Our Portfolio
             </p>
-            <h2 className="font-semibold text-[45px] leading-[0.95] tracking-[0.005em] uppercase max-md:text-3xl">
+            <h2 className="font-['El_Messiri'] font-semibold text-[45px] leading-[0.95] tracking-[0.005em] uppercase max-md:text-3xl">
               A Showcase of
               <br />
               Elegance and Detail
             </h2>
             <Link
               to="/projects"
-              className="mt-5 inline-flex items-center gap-2 border-b border-white/70 pb-0.5 text-[18px] font-bold text-white"
+              className="mt-5 inline-flex items-center gap-2 border-b border-white/70 pb-0.5 font-['El_Messiri'] text-[18px] font-medium text-white"
             >
               Explore more Projects
               <ArrowUpRight size={16} strokeWidth={1.1} className="shrink-0" />

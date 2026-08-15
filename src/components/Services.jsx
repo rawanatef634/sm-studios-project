@@ -6,22 +6,22 @@ import { Link } from "react-router-dom";
 
 export default function Services() {
   return (
-    <section className="relative w-full md:w-[1512px] mx-auto overflow-hidden">
+    <section className="relative w-full max-w-[1512px] mx-auto overflow-hidden bg-white">
       {/* Header section */}
       <div className="flex flex-col justify-center items-center gap-[20px] w-[90%] md:w-[1312px] 
       mx-auto text-center md:text-left mt-5 md:mt-0 md:absolute md:left-1/2 md:-translate-x-1/2 md:top-[92px]">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full">
           <div>
-            <span className="uppercase tracking-wider font-semibold text-gray-600 text-2xl">
+            <span className="uppercase tracking-[0.16em] font-['El_Messiri'] text-[#8b9199] text-xl md:text-2xl">
               Our Expertise
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold mt-2">
+            <h2 className="font-['El_Messiri'] text-3xl md:text-5xl font-semibold mt-2 text-[#111111]">
               From concept to completion
             </h2>
           </div>
           <Link
             to="/services"
-            className="mt-4 md:mt-0 flex items-center gap-2 text-2xl font-bold text-gray-900 hover:underline justify-center"
+            className="mt-4 md:mt-0 flex items-center gap-2 text-lg md:text-2xl font-['El_Messiri'] font-semibold text-gray-900 hover:underline justify-center"
           >
             Explore Our Services
             <ArrowUpRight size={18} />
@@ -66,7 +66,7 @@ export default function Services() {
               transition={{ duration: 0.8, ease: "easeOut", delay: idx * 0.3 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-white text-2xl font-semibold transform transition-all duration-700 group-hover:-translate-y-24 group-hover:scale-125">
+              <h3 className="text-white text-2xl font-['El_Messiri'] font-semibold tracking-wide transform transition-all duration-700 group-hover:-translate-y-24 group-hover:scale-125">
                 {service.title.toUpperCase()}
               </h3>
             </motion.div>
@@ -96,7 +96,7 @@ export default function Services() {
               >
                 <Link
                   to={`/services/${service.slug}`}
-                  className="px-5 py-2 bg-white text-gray-900 rounded hover:bg-gray-200 transition"
+                  className="px-5 py-2 bg-white text-gray-900 font-['El_Messiri'] hover:bg-gray-200 transition"
                 >
                   Learn more
                 </Link>

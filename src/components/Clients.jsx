@@ -19,7 +19,7 @@ export default function Clients() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading */}
         <motion.p
-          className="uppercase tracking-wide text-md text-gray-500 mb-2"
+          className="uppercase tracking-[0.16em] text-sm font-['El_Messiri'] text-[#8b9199] mb-2"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -29,7 +29,7 @@ export default function Clients() {
         </motion.p>
 
         <motion.h2
-          className="text-3xl md:text-[44px] font-semibold text-gray-900 mb-12"
+          className="font-['El_Messiri'] text-3xl md:text-[44px] font-semibold text-gray-900 mb-12"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}

@@ -35,7 +35,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative w-full min-h-screen md:h-[547px] bg-black text-white overflow-hidden">
+    <section className="relative w-full h-screen min-h-[640px] bg-black text-white overflow-hidden">
       {/* === BACKGROUND IMAGE === */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -78,7 +78,10 @@ export default function HeroSection() {
           transition={{ duration: 0.4 }}
           className="font-['El_Messiri'] text-2xl md:text-[40px] uppercase mb-2"
         >
-          {String(slides[current].id).padStart(2, "0")}/{slides.length}
+          <span>{String(slides[current].id).padStart(2, "0")}</span>
+          <span className="text-[0.62em] opacity-90">
+            /{String(slides.length).padStart(2, "0")}
+          </span>
         </motion.div>
 
         {/* Slide title */}
@@ -90,8 +93,9 @@ export default function HeroSection() {
             exit={{ opacity: 0, y: -40 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
             className="
-              text-4xl sm:text-5xl md:text-[80px] lg:text-[114px]
-              leading-tight md:leading-[1.1]
+              font-['El_Messiri']
+              text-4xl sm:text-5xl md:text-[72px] lg:text-[96px]
+              leading-[1.05] tracking-[0.01em]
             "
           >
             {slides[current].title}
@@ -101,49 +105,19 @@ export default function HeroSection() {
         {/* Project link */}
         <a
           href={slides[current].link}
-          className="mt-6 inline-block text-white/80 hover:text-white underline underline-offset-8 text-base md:text-lg transition"
+          className="mt-6 inline-block font-['El_Messiri'] text-white/80 hover:text-white underline underline-offset-8 text-base md:text-lg transition"
         >
-          View Project
+          View project
         </a>
       </div>
 
       {/* === SOCIAL ICONS === */}
-      <div
-        className="
-          absolute 
-          z-10
-          flex items-center gap-6 md:gap-8 
-          bottom-8 left-6 
-          md:bottom-8 md:left-[100px]
-          
-          /* Mobile: vertical on the left */
-          max-md:flex-col max-md:items-center max-md:left-4 max-md:top-1/2 max-md:-translate-y-1 max-md:bottom-auto
-        "
-      >
+      <div className="absolute z-10 bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 md:gap-8">
         <SocialLinks
           className="contents"
           itemClassName="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
           iconClassName="w-5 h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-80"
         />
-      </div>
-
-      {/* === SLIDE NAVIGATION === */}
-      <div className="absolute bottom-8 right-6 md:bottom-[25px] md:right-[100px] flex flex-wrap md:flex-nowrap gap-6 md:gap-[89px] items-center z-10">
-        {slides.map((s, idx) => (
-          <motion.div
-            key={s.id}
-            whileHover={{ scale: 1.05 }}
-            onClick={() => setCurrent(idx)}
-            className={`cursor-pointer transition-all duration-300 ${
-              idx === current ? "text-white" : "text-white/60"
-            }`}
-          >
-            <div className="font-['El_Messiri'] text-lg md:text-[22px] uppercase">
-              {String(s.id).padStart(2, "0")}
-            </div>
-            <div className="text-xs md:text-sm tracking-wide">{s.title}</div>
-          </motion.div>
-        ))}
       </div>
     </section>
   );

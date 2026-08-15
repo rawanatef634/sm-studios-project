@@ -79,7 +79,7 @@ export default function ServicesPage() {
                 <span className="absolute top-0 left-0 text-7xl md:text-8xl font-bold text-white/5 select-none">
                   {service.id}
                 </span>
-                <h2 className="text-[28px] md:text-[40px] font-semibold mb-5 relative z-10">
+                <h2 className="text-[28px] md:text-[40px] font-['El_Messiri'] font-semibold mb-5 relative z-10">
                   {service.title}
                 </h2>
                 <p className="text-gray-400 leading-relaxed text-[16px] md:text-[18px] mb-8 relative z-10">
@@ -101,7 +101,7 @@ export default function ServicesPage() {
       <section className="bg-[#161B1E] py-24 text-white overflow-x-hidden">
         <div className="max-w-[1512px] mx-auto px-6 md:px-12 text-center">
           <motion.h2
-            className="text-3xl md:text-4xl font-semibold mb-6"
+            className="font-['El_Messiri'] text-3xl md:text-4xl font-semibold mb-6"
             variants={fadeInUp}
             initial="hidden"
             whileInView="show"

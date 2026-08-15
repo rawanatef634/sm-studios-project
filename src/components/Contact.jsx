@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function ContactSection() {
   return (
     <section
-      className="h-[440] mx-auto relative bg-cover bg-center"
+      className="min-h-[440px] mx-auto relative bg-cover bg-center"
       style={{
         backgroundImage: "url('/assets/contact.jpg')",
       }}
@@ -14,7 +14,7 @@ export default function ContactSection() {
       <div className="max-w-7xl mx-auto px-6 py-24 flex flex-col md:flex-row items-center md:items-center md:justify-between gap-8">
         {/* Left text */}
         <div className="text-white md:max-w-xl">
-          <h2 className="text-4xl md:text-5xl leading-tight mb-4">
+          <h2 className="font-['El_Messiri'] text-4xl md:text-5xl leading-tight mb-4">
             LET’S CREATE YOUR
             <br />
             NEXT SPACE
@@ -29,7 +29,7 @@ export default function ContactSection() {
         <div className="flex-shrink-0">
           <Link
             to="/contact"
-            className="cursor-pointer inline-flex items-center gap-3 px-6 py-3 border border-white text-white hover:bg-white hover:text-black transition duration-300 text-lg"
+            className="cursor-pointer inline-flex items-center gap-3 px-6 py-3 border border-white text-white font-['El_Messiri'] tracking-[0.12em] hover:bg-white hover:text-black transition duration-300 text-lg"
           >
             GET IN TOUCH
             <svg

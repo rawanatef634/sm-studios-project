@@ -103,7 +103,7 @@ const Contact = () => {
           viewport={{ once: true }}
           variants={fadeUp}
         >
-          <p className="max-w-6xl mx-auto md:text-[32px]">
+          <p className="max-w-6xl mx-auto md:text-[32px] font-['El_Messiri'] font-light">
             Let's discuss your next project. Our team is ready to bring your ideas to life.
           </p>
         </motion.section>
@@ -184,7 +184,7 @@ const Contact = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="cursor-pointer bg-white text-black px-8 py-3 hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="cursor-pointer bg-white text-black px-8 py-3 font-['El_Messiri'] tracking-[0.12em] hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? "SENDING..." : "SUBMIT"}
                 </button>
