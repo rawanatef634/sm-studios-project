@@ -6,6 +6,7 @@ const Navbar = () => {
   const [desktopServicesOpen, setDesktopServicesOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const desktopCloseTimer = useRef(null);
 
   // Close desktop services dropdown when clicking outside
   useEffect(() => {
@@ -54,59 +55,85 @@ const Navbar = () => {
           </Link>
 
           {/* Services dropdown (desktop) */}
-          <div className="relative" ref={dropdownRef}>
-            <div
-              onClick={() => setDesktopServicesOpen((prev) => !prev)}
-              className="hover:opacity-80 transition flex items-center space-x-1 cursor-pointer"
-            >
-              <span>Services</span>
-              <svg
-                className={`w-3 h-3 mt-px transition-transform ${
-                  desktopServicesOpen ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          <div
+            className="relative"
+            ref={dropdownRef}
+            onMouseEnter={() => {
+              clearTimeout(desktopCloseTimer.current);
+              setDesktopServicesOpen(true);
+            }}
+            onMouseLeave={() => {
+              desktopCloseTimer.current = setTimeout(() => {
+                setDesktopServicesOpen(false);
+              }, 180);
+            }}
+          >
+            <div className="flex items-center space-x-1">
+              <Link to="/services" className="hover:opacity-80 transition">
+                Services
+              </Link>
+              <button
+                type="button"
+                aria-label="Open services menu"
+                aria-expanded={desktopServicesOpen}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  clearTimeout(desktopCloseTimer.current);
+                  setDesktopServicesOpen(true);
+                }}
+                className="hover:opacity-80 transition p-0.5"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+                <svg
+                  className={`w-3 h-3 mt-px transition-transform ${
+                    desktopServicesOpen ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
             </div>
 
             {desktopServicesOpen && (
-              <div className="absolute left-0 top-full bg-white text-black mt-2 rounded shadow-lg min-w-[180px]">
-                <Link
-                  to="/services/interior-design"
-                  className="block px-4 py-2 hover:bg-gray-100"
-                  onClick={() => setDesktopServicesOpen(false)}
-                >
-                  Interior Design
-                </Link>
-                <Link
-                  to="/services/architecture-design"
-                  className="block px-4 py-2 hover:bg-gray-100"
-                  onClick={() => setDesktopServicesOpen(false)}
-                >
-                  Architecture Design
-                </Link>
-                <Link
-                  to="/services/3d-visualization"
-                  className="block px-4 py-2 hover:bg-gray-100"
-                  onClick={() => setDesktopServicesOpen(false)}
-                >
-                  3D Visualization
-                </Link>
-                <Link
-                  to="/services/interior-fit-outs"
-                  className="block px-4 py-2 hover:bg-gray-100"
-                  onClick={() => setDesktopServicesOpen(false)}
-                >
-                  Interior Fit-Outs
-                </Link>
+              <div className="absolute left-0 top-full z-50 pt-2">
+                <div className="bg-white text-black rounded shadow-lg min-w-[180px] pointer-events-auto">
+                  <Link
+                    to="/services/interior-design"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setDesktopServicesOpen(false)}
+                  >
+                    Interior Design
+                  </Link>
+                  <Link
+                    to="/services/architecture-design"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setDesktopServicesOpen(false)}
+                  >
+                    Architecture Design
+                  </Link>
+                  <Link
+                    to="/services/3d-visualization"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setDesktopServicesOpen(false)}
+                  >
+                    3D Visualization
+                  </Link>
+                  <Link
+                    to="/services/interior-fit-outs"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setDesktopServicesOpen(false)}
+                  >
+                    Interior Fit-Outs
+                  </Link>
+                </div>
               </div>
             )}
           </div>
