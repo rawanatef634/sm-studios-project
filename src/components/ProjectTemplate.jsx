@@ -42,7 +42,7 @@ export default function ProjectTemplate({ project }) {
       <div className="bg-[#161B1E]">
         {/* MAIN IMAGE */}
         <motion.div
-          className="max-w-7xl mx-auto px-6 py-16"
+          className="max-w-7xl mx-auto px-4 py-8 md:px-6 md:py-16"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -56,7 +56,7 @@ export default function ProjectTemplate({ project }) {
             <OptimizedImage
               src={project.mainImage || project.img}
               alt={project.title}
-              className="w-full h-[500px] object-contain md:object-cover"
+              className="w-full aspect-[4/3] object-cover md:aspect-auto md:h-[500px]"
               sizes="(max-width: 1280px) 100vw, 1280px"
               priority
             />
@@ -71,7 +71,7 @@ export default function ProjectTemplate({ project }) {
           viewport={{ once: true }}
           variants={staggerParent}
         >
-          <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-8 text-white text-xl md:text-2xl font-light">
+          <div className="max-w-6xl mx-auto flex flex-col items-start gap-4 px-6 md:flex-row md:flex-wrap md:items-center md:justify-center md:gap-8 text-white text-base md:text-2xl font-light">
             {[
               { label: "State", value: project.state },
               { label: "Town", value: project.town },
@@ -107,7 +107,7 @@ export default function ProjectTemplate({ project }) {
                 <OptimizedImage
                   src={project.designImages[0]}
                   alt="design-left"
-                  className="w-full h-[420px] object-cover"
+                  className="w-full h-[240px] object-cover md:h-[420px]"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </motion.div>
@@ -143,7 +143,7 @@ export default function ProjectTemplate({ project }) {
                 <OptimizedImage
                   src={project.designImages[1]}
                   alt="design-right"
-                  className="w-full h-[420px] object-cover"
+                  className="w-full h-[240px] object-cover md:h-[420px]"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </motion.div>
@@ -163,7 +163,7 @@ export default function ProjectTemplate({ project }) {
             <OptimizedImage
               src={project.wideImage}
               alt="project-wide"
-              className="w-full h-[400px] object-cover shadow-2xl md:h-[600px]"
+              className="w-full h-[220px] object-cover shadow-2xl md:h-[600px]"
               sizes="(max-width: 1280px) 100vw, 1280px"
             />
           </motion.div>

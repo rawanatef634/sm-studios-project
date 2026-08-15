@@ -75,7 +75,8 @@ const Careers = () => {
         const resumeData = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(String(reader.result || ""));
-          reader.onerror = () => reject(reader.error || new Error("Could not read resume"));
+          reader.onerror = () =>
+            reject(reader.error || new Error("Could not read resume"));
           reader.readAsDataURL(file);
         });
 
@@ -136,6 +137,7 @@ const Careers = () => {
 
       <div className="bg-[#161B1E]">
         {/* Intro */}
+        {/* make it smaller on mobile */}
         <motion.section
           className="text-white text-center py-12 px-6"
           initial="hidden"
@@ -143,9 +145,10 @@ const Careers = () => {
           viewport={{ once: true }}
           variants={fadeUp}
         >
-          <p className="max-w-6xl mx-auto text-[32px] font-['El_Messiri'] font-light">
-            We don't have any open positions right now, but we'd love to stay connected.  
-            You can send us your CV and we'll reach out when opportunities arise.
+          <p className="max-w-6xl mx-auto text-[24px] font-['El_Messiri'] font-light lg:text-[32px]">
+            We don't have any open positions right now, but we'd love to stay
+            connected. You can send us your CV and we'll reach out when
+            opportunities arise.
           </p>
         </motion.section>
 
@@ -157,10 +160,7 @@ const Careers = () => {
           viewport={{ once: true }}
           variants={fadeUp}
         >
-          <form
-            onSubmit={handleSubmit}
-            className="w-full max-w-4xl space-y-6"
-          >
+          <form onSubmit={handleSubmit} className="w-full max-w-4xl space-y-6">
             {/* Personal Info Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -253,7 +253,9 @@ const Careers = () => {
                 <p className="text-gray-300 mb-2 md:text-[26px]">
                   Drag your resume here or click to upload
                 </p>
-                <p className="md:text-[16px] text-gray-300">Use a pdf, docx, or doc (Max 3MB)</p>
+                <p className="md:text-[16px] text-gray-300">
+                  Use a pdf, docx, or doc (Max 3MB)
+                </p>
               </label>
 
               <input
@@ -277,9 +279,11 @@ const Careers = () => {
             </div>
 
             {status && (
-              <p className={`text-center text-sm mt-4 ${
-                status.includes("✅") ? "text-green-400" : "text-red-400"
-              }`}>
+              <p
+                className={`text-center text-sm mt-4 ${
+                  status.includes("✅") ? "text-green-400" : "text-red-400"
+                }`}
+              >
                 {status}
               </p>
             )}
@@ -295,7 +299,13 @@ const Careers = () => {
             </div>
 
             <p className="text-center text-gray-400 text-sm mt-4">
-              Or email your resume directly to: <a href="mailto:info@smstudios-om.com" className="text-white underline">info@smstudios-om.com</a>
+              Or email your resume directly to:{" "}
+              <a
+                href="mailto:info@smstudios-om.com"
+                className="text-white underline"
+              >
+                info@smstudios-om.com
+              </a>
             </p>
           </form>
         </motion.section>

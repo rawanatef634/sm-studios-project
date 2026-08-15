@@ -103,8 +103,8 @@ function DesktopSlide({ left, center, right }) {
 
 function MobileSlide({ center }) {
   return (
-    <Link to={`/projects/${center.id}`} className="block md:hidden">
-      <div className="h-[320px] overflow-hidden">
+    <Link to={`/projects/${center.id}`} className="block px-4 md:hidden">
+      <div className="h-[240px] overflow-hidden">
         <OptimizedImage
           src={projectImage(center)}
           alt={center.title}
@@ -113,10 +113,14 @@ function MobileSlide({ center }) {
           fill
         />
       </div>
-      <h3 className="font-['El_Messiri'] pt-3 text-4xl leading-none text-white">{center.title}</h3>
-      <p className="pt-2 font-['El_Messiri'] text-xs leading-relaxed text-[#a3a3a3]">
-        {center.caption}
-      </p>
+      <div className="flex items-start justify-between gap-4 pt-3">
+        <h3 className="font-['El_Messiri'] text-2xl leading-none text-white">
+          {center.title}
+        </h3>
+        <p className="max-w-[48%] pt-0.5 font-['El_Messiri'] text-[10px] leading-relaxed text-[#a3a3a3]">
+          {center.caption || Caption({ project: center })}
+        </p>
+      </div>
     </Link>
   );
 }
@@ -223,12 +227,12 @@ export default function PortfolioCarousel() {
             </Link>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 pt-16">
+          <div className="flex shrink-0 items-center gap-2 pt-2 md:pt-16">
             <button
               type="button"
               onClick={goPrev}
               aria-label="Previous project"
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/70 text-white transition hover:bg-white/10"
+              className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-white/70 text-white transition hover:bg-white/10"
             >
               <ArrowLeft size={17} strokeWidth={1} />
             </button>
@@ -236,7 +240,7 @@ export default function PortfolioCarousel() {
               type="button"
               onClick={goNext}
               aria-label="Next project"
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/70 text-white transition hover:bg-white/10"
+              className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-white/70 text-white transition hover:bg-white/10"
             >
               <ArrowRight size={17} strokeWidth={1} />
             </button>

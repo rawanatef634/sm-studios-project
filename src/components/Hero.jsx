@@ -8,6 +8,7 @@ const slides = [
     id: 1,
     title: "MAJLIS",
     image: "/assets/majlis3.png",
+    mobileImage: "/assets/majlis2.png",
     link: "/projects/1",
   },
   {
@@ -35,7 +36,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative w-full h-screen min-h-[640px] bg-black text-white overflow-hidden">
+    <section className="relative w-full h-[100svh] min-h-0 overflow-hidden bg-black text-white md:h-screen md:min-h-[640px]">
       {/* === BACKGROUND IMAGE === */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -46,27 +47,38 @@ export default function HeroSection() {
           exit={{ opacity: 0 }}
           transition={{ duration: 1.2 }}
         >
-          <OptimizedImage
-            src={slides[current].image}
-            alt=""
-            className="h-full w-full object-cover object-center"
-            sizes="100vw"
-            fill
-            priority
-          />
+          <div className="absolute inset-0 md:hidden">
+            <OptimizedImage
+              src={slides[current].mobileImage || slides[current].image}
+              alt=""
+              className="h-full w-full object-cover object-center"
+              sizes="100vw"
+              fill
+              priority
+            />
+          </div>
+          <div className="absolute inset-0 hidden md:block">
+            <OptimizedImage
+              src={slides[current].image}
+              alt=""
+              className="h-full w-full object-cover object-center"
+              sizes="100vw"
+              fill
+              priority
+            />
+          </div>
         </motion.div>
       </AnimatePresence>
 
       {/* === OVERLAY === */}
-      <div className="absolute inset-0 bg-[#1C1918]/60 z-0" />
+      <div className="absolute inset-0 z-0 bg-[#1C1918]/35 md:bg-[#1C1918]/60" />
 
       {/* === CONTENT === */}
       <div
         className="
-          relative z-10 flex flex-col 
-          justify-start pt-32 sm:pt-40 md:justify-center md:pt-0 
-          px-4 sm:px-8 md:px-[100px] 
-          h-full
+          relative z-10 flex h-full flex-col justify-center
+          px-5 sm:px-8 md:px-[100px]
+          max-md:pb-24
         "
       >
         {/* Slide counter */}
@@ -112,12 +124,48 @@ export default function HeroSection() {
       </div>
 
       {/* === SOCIAL ICONS === */}
-      <div className="absolute z-10 bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 md:gap-8">
+      <div
+        className="
+          absolute 
+          z-10
+          flex items-center gap-6 md:gap-8 
+          bottom-8 left-6 
+          md:bottom-8 md:left-[100px]
+          max-md:flex-col max-md:items-center max-md:left-4 max-md:gap-3
+        "
+      >
         <SocialLinks
           className="contents"
-          itemClassName="w-10 h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
+          itemClassName="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-white/40 hover:border-white transition"
           iconClassName="w-5 h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-80"
         />
+      </div>
+
+      {/* === SLIDE NAVIGATION === */}
+      <div className="absolute bottom-8 right-6 md:bottom-[25px] md:right-[100px] flex flex-nowrap gap-5 md:gap-[89px] items-end z-10">
+        {slides.map((s, idx) => (
+          <motion.div
+            key={s.id}
+            whileHover={{ scale: 1.05 }}
+            onClick={() => setCurrent(idx)}
+            className={`cursor-pointer transition-all duration-300 ${
+              idx === current ? "text-white" : "text-white/60"
+            }`}
+          >
+            <div
+              className={`font-['El_Messiri'] text-lg md:text-[22px] uppercase pb-1 ${
+                idx === current
+                  ? "max-md:border-b-2 max-md:border-white"
+                  : "max-md:border-b-2 max-md:border-transparent"
+              }`}
+            >
+              {String(s.id).padStart(2, "0")}
+            </div>
+            <div className="hidden md:block text-xs md:text-sm tracking-wide">
+              {s.title}
+            </div>
+          </motion.div>
+        ))}
       </div>
     </section>
   );

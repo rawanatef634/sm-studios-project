@@ -19,7 +19,7 @@ export default function Clients() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading */}
         <motion.p
-          className="uppercase tracking-[0.16em] text-sm font-['El_Messiri'] text-[#8b9199] mb-2"
+          className="uppercase tracking-[0.16em] text-sm font-['El_Messiri'] text-[#8b9199] mb-2 text-center md:text-left"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -29,7 +29,7 @@ export default function Clients() {
         </motion.p>
 
         <motion.h2
-          className="font-['El_Messiri'] text-3xl md:text-[44px] font-semibold text-gray-900 mb-12"
+          className="font-['El_Messiri'] text-2xl md:text-[44px] font-semibold text-gray-900 mb-8 md:mb-12 text-center md:text-left"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
@@ -41,7 +41,7 @@ export default function Clients() {
 
         {/* Logos grid */}
         <motion.div
-          className="flex flex-wrap justify-center gap-12"
+          className="flex flex-wrap justify-center gap-6 md:gap-12"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -57,7 +57,7 @@ export default function Clients() {
           {Clients.map((client) => (
             <motion.div
               key={client.id}
-              className="text-center w-55 sm:w-66"
+              className="text-center w-auto sm:w-66"
               variants={{
                 hidden: { opacity: 0, y: 40 },
                 visible: { opacity: 1, y: 0 },
@@ -68,7 +68,7 @@ export default function Clients() {
               <img
                 src={client.image}
                 alt={`Client ${client.id}`}
-                className="w-44 h-44 sm:w-77 sm:h-55 object-contain "
+                className="w-16 h-16 md:w-77 md:h-55 object-contain "
               />
             </motion.div>
           ))}

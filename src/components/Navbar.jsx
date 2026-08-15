@@ -13,7 +13,7 @@ const Navbar = () => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDesktopServicesOpen(false);
-      } 
+      }
     };
 
     if (desktopServicesOpen) {
@@ -32,9 +32,16 @@ const Navbar = () => {
     }
   }, [mobileOpen]);
 
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
   return (
     <header className="absolute top-0 left-0 w-full z-50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-8 py-8">
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-5 py-5 md:px-8 md:py-8">
         {/* Logo */}
         <Link to="/" className="flex items-center">
           <img src="/assets/sm-logo.png" alt="Logo" className="h-10 w-auto" />
@@ -188,34 +195,34 @@ const Navbar = () => {
 
       {/* Mobile dropdown menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#161B1E]/95 backdrop-blur border-t border-white/10">
-          <nav className="px-8 py-4 flex flex-col space-y-4 text-white text-sm font-['El_Messiri'] tracking-[0.14em] uppercase">
+        <div className="md:hidden border-t border-white/10 bg-[#161B1E]">
+          <nav className="flex flex-col px-6 py-2 text-white font-['El_Messiri']">
             <Link
               to="/projects"
-              className="hover:opacity-80 transition"
+              className="border-b border-white/10 py-4 text-[15px] tracking-[0.16em] uppercase"
               onClick={() => setMobileOpen(false)}
             >
               Projects
             </Link>
 
-            {/* Services clickable + accordion (mobile) */}
-            <div>
+            <div className="border-b border-white/10">
               <div className="flex items-center justify-between">
                 <Link
                   to="/services"
-                  className="hover:opacity-80 transition"
+                  className="flex-1 py-4 text-[15px] tracking-[0.16em] uppercase"
                   onClick={() => setMobileOpen(false)}
                 >
                   Services
                 </Link>
-
-                {/* Arrow button to open submenu */}
                 <button
+                  type="button"
+                  aria-label="Toggle services menu"
+                  aria-expanded={mobileServicesOpen}
                   onClick={() => setMobileServicesOpen((prev) => !prev)}
-                  className="ml-2"
+                  className="flex h-12 w-12 items-center justify-center"
                 >
                   <svg
-                    className={`w-3 h-3 mt-px transition-transform ${
+                    className={`h-4 w-4 transition-transform ${
                       mobileServicesOpen ? "rotate-180" : ""
                     }`}
                     fill="none"
@@ -225,7 +232,7 @@ const Navbar = () => {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      strokeWidth={2}
+                      strokeWidth={1.5}
                       d="M19 9l-7 7-7-7"
                     />
                   </svg>
@@ -233,31 +240,31 @@ const Navbar = () => {
               </div>
 
               {mobileServicesOpen && (
-                <div className="mt-2 pl-4 flex flex-col space-y-2 text-xs tracking-normal normal-case">
+                <div className="mb-3 ml-1 flex flex-col border-l border-white/20 pl-4">
                   <Link
                     to="/services/interior-design"
-                    className="hover:opacity-80 transition"
+                    className="py-2.5 text-[14px] tracking-[0.04em] text-white/80"
                     onClick={() => setMobileOpen(false)}
                   >
                     Interior Design
                   </Link>
                   <Link
                     to="/services/architecture-design"
-                    className="hover:opacity-80 transition"
+                    className="py-2.5 text-[14px] tracking-[0.04em] text-white/80"
                     onClick={() => setMobileOpen(false)}
                   >
                     Architecture Design
                   </Link>
                   <Link
                     to="/services/3d-visualization"
-                    className="hover:opacity-80 transition"
+                    className="py-2.5 text-[14px] tracking-[0.04em] text-white/80"
                     onClick={() => setMobileOpen(false)}
                   >
                     3D Visualization
                   </Link>
                   <Link
                     to="/services/interior-fit-outs"
-                    className="hover:opacity-80 transition"
+                    className="py-2.5 text-[14px] tracking-[0.04em] text-white/80"
                     onClick={() => setMobileOpen(false)}
                   >
                     Interior Fit-Outs
@@ -268,14 +275,14 @@ const Navbar = () => {
 
             <Link
               to="/contact"
-              className="hover:opacity-80 transition"
+              className="border-b border-white/10 py-4 text-[15px] tracking-[0.16em] uppercase"
               onClick={() => setMobileOpen(false)}
             >
               Contact
             </Link>
             <Link
               to="/careers"
-              className="hover:opacity-80 transition"
+              className="py-4 text-[15px] tracking-[0.16em] uppercase"
               onClick={() => setMobileOpen(false)}
             >
               Careers

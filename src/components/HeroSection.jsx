@@ -8,7 +8,7 @@ const HeroSection = ({ title, breadcrumb, backgroundImage }) => {
   const parts = breadcrumb ? breadcrumb.split(" / ") : [];
 
   return (
-    <section className="relative bg-cover bg-center h-[547px] flex items-center">
+    <section className="relative bg-cover bg-center h-[340px] md:h-[547px] flex items-center">
       {backgroundImage && (
         <div className="absolute inset-0 -z-0">
           <OptimizedImage

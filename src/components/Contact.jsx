@@ -11,10 +11,10 @@ export default function ContactSection() {
     >
       <div className="absolute inset-0 bg-[#2520201c] z-0 pointer-events-none"></div>
 
-      <div className="max-w-7xl mx-auto px-6 py-24 flex flex-col md:flex-row items-center md:items-center md:justify-between gap-8">
+      <div className="max-w-7xl mx-auto px-6 py-24 flex flex-col md:flex-row items-center md:items-center md:justify-between gap-8 text-center md:text-left">
         {/* Left text */}
         <div className="text-white md:max-w-xl">
-          <h2 className="font-['El_Messiri'] text-4xl md:text-5xl leading-tight mb-4">
+          <h2 className="font-['El_Messiri'] text-3xl md:text-5xl leading-tight mb-4 uppercase">
             LET’S CREATE YOUR
             <br />
             NEXT SPACE
