@@ -53,6 +53,9 @@ const Contact = () => {
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
       setStatus("");
+      window.heronsignal.event("contact_inquiry_started", {
+        project: form.project,
+      });
 
       try {
         const res = await fetch("/api/contact", {
@@ -69,6 +72,9 @@ const Contact = () => {
         }
 
         setStatus("Message sent successfully ✅");
+        window.heronsignal.event("contact_inquiry_completed", {
+          project: form.project,
+        });
         setForm({
           name: "",
           email: "",
@@ -78,7 +84,11 @@ const Contact = () => {
           area: "",
           requirements: "",
         });
-      } catch {
+      } catch (error) {
+        window.heronsignal.log("warn", "Contact inquiry failed", {
+          step: "submission",
+        });
+        window.heronsignal.captureError(error);
         setStatus("Something went wrong ❌");
       } finally {
         setIsSubmitting(false);
