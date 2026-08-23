@@ -1,6 +1,5 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { event, log, captureError } from "@heronsignal/web";
 import HeroSection from "../components/HeroSection";
 import Footer from "../components/Footer";
 
@@ -23,14 +22,6 @@ const Contact = () => {
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const inquiryStartedRef = useRef(false);
-  const projectTypeSelectedRef = useRef(false);
-
-  const markInquiryStarted = () => {
-    if (inquiryStartedRef.current) return;
-    inquiryStartedRef.current = true;
-    event("inquiry_started", { source: "contact_form" });
-  };
 
   const validate = () => {
     let newErrors = {};
@@ -45,15 +36,6 @@ const Contact = () => {
   };
 
   const handleChange = (e) => {
-    markInquiryStarted();
-    if (
-      e.target.name === "project" &&
-      e.target.value.trim() &&
-      !projectTypeSelectedRef.current
-    ) {
-      projectTypeSelectedRef.current = true;
-      event("inquiry_project_type_selected", { source: "contact_form" });
-    }
     setForm({ ...form, [e.target.name]: e.target.value });
     // Clear error when user starts typing
     if (errors[e.target.name]) {
@@ -65,14 +47,12 @@ const Contact = () => {
     e.preventDefault();
     if (isSubmitting) return;
 
-    markInquiryStarted();
     const validationErrors = validate();
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
       setStatus("");
-      event("inquiry_submitted", { source: "contact_form" });
 
       try {
         const res = await fetch("/api/contact", {
@@ -83,13 +63,11 @@ const Contact = () => {
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || !data.ok) {
-          log("warn", "Inquiry send failed", { step: "submit" });
           if (data.errors) setErrors(data.errors);
           setStatus(data.error || "Something went wrong ❌");
           return;
         }
 
-        event("inquiry_completed", { source: "contact_form" });
         setStatus("Message sent successfully ✅");
         setForm({
           name: "",
@@ -100,15 +78,11 @@ const Contact = () => {
           area: "",
           requirements: "",
         });
-      } catch (error) {
-        log("warn", "Inquiry send failed", { step: "submit" });
-        captureError(error instanceof Error ? error : String(error));
+      } catch {
         setStatus("Something went wrong ❌");
       } finally {
         setIsSubmitting(false);
       }
-    } else {
-      log("warn", "Inquiry validation failed", { step: "validate" });
     }
   };
 
