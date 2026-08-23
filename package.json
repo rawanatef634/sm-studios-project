@@ -14,6 +14,7 @@
     "blob:inspect": "node scripts/inspect-blob.js"
   },
   "dependencies": {
+    "@heronsignal/web": "^0.1.0",
     "@tailwindcss/vite": "^4.1.12",
     "@vercel/blob": "^2.8.0",
     "bcryptjs": "^3.0.3",
