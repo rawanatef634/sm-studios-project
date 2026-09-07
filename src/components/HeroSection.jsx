@@ -71,7 +71,7 @@ const HeroSection = ({ title, breadcrumb, backgroundImage }) => {
 
         {/* Title */}
         <motion.h1
-          className="font-['El_Messiri'] text-4xl md:text-8xl font-light text-white tracking-wide drop-shadow-lg text-center"
+          className="text-center font-['El_Messiri'] text-5xl font-semibold uppercase leading-[1.05] tracking-[0.02em] text-white drop-shadow-lg md:text-[88px] lg:text-[104px]"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}

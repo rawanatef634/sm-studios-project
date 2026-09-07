@@ -1,38 +1,60 @@
-import Services from "../components/Services";
-import About from "../components/About";
-import Team from "../components/Team";
-import Clients from "../components/Clients";
-import Projects from "../components/Projects";
-import Contact from "../components/Contact";
-import Footer from "../components/Footer";
+import { lazy, Suspense, useEffect, useState } from "react";
 import HeroSection from "../components/Hero";
+
+const Services = lazy(() => import("../components/Services"));
+const About = lazy(() => import("../components/About"));
+const Team = lazy(() => import("../components/Team"));
+const Clients = lazy(() => import("../components/Clients"));
+const Projects = lazy(() => import("../components/Projects"));
+const Contact = lazy(() => import("../components/Contact"));
+const Footer = lazy(() => import("../components/Footer"));
+
+/** Mount below-fold sections after first paint so hero can win the network. */
+function BelowFold({ children }) {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let idleId;
+    const raf = requestAnimationFrame(() => {
+      if (typeof window.requestIdleCallback === "function") {
+        idleId = window.requestIdleCallback(() => setReady(true), {
+          timeout: 600,
+        });
+      } else {
+        idleId = window.setTimeout(() => setReady(true), 80);
+      }
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      if (typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(idleId);
+      } else {
+        clearTimeout(idleId);
+      }
+    };
+  }, []);
+
+  if (!ready) return null;
+  return children;
+}
 
 export default function Home() {
   return (
     <>
-      {/* Hero Section */}
       <HeroSection />
 
-      {/* Services Section */}
-      <Services />
-
-      {/* About Section */}
-      <About />
-
-      {/* Team Section */}
-      <Team />
-
-      {/* Clients Section */}
-      <Clients />
-
-      {/* Projects Showcase */}
-      <Projects />
-
-      {/* Contact CTA */}
-      <Contact />
-
-      {/* Footer */}
-      <Footer />
+      <BelowFold>
+        <Suspense fallback={null}>
+          <Services />
+          <About />
+          <Team />
+          <Clients />
+          <Projects />
+          <Contact />
+          <Footer />
+        </Suspense>
+      </BelowFold>
     </>
   );
 }

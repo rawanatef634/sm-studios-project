@@ -70,26 +70,36 @@ export default function ServicesPage() {
 
               {/* Description */}
               <motion.div
-                className="relative w-full md:w-[450px] flex flex-col justify-center"
+                className="relative flex w-full flex-col justify-center md:w-[450px]"
                 variants={idx % 2 === 1 ? fadeInLeft : fadeInRight}
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true }}
               >
-                <span className="absolute top-0 left-0 text-7xl md:text-8xl font-bold text-white/5 select-none">
+                <span
+                  className="mb-3 select-none font-['El_Messiri'] text-[42px] font-light leading-none md:text-[52px]"
+                  style={{
+                    color: "transparent",
+                    WebkitTextStroke: "1.25px rgba(255,255,255,0.55)",
+                  }}
+                  aria-hidden
+                >
                   {service.id}
                 </span>
-                <h2 className="text-[28px] md:text-[40px] font-['El_Messiri'] font-semibold mb-5 relative z-10">
+                <h2 className="relative z-10 mb-5 font-['El_Messiri'] text-[28px] font-semibold uppercase leading-tight md:text-[40px]">
                   {service.title}
                 </h2>
-                <p className="text-gray-400 leading-relaxed text-[16px] md:text-[18px] mb-8 relative z-10">
+                <p className="relative z-10 mb-8 text-[16px] leading-relaxed text-gray-400 md:text-[18px]">
                   {service.text}
                 </p>
                 <Link
                   to={`/services/${service.slug}`}
-                  className="px-0 py-2 border-b border-white w-[120px] text-[18px] hover:text-black hover:bg-white transition-all duration-300 relative z-10 inline-block"
+                  className="relative z-10 inline-flex w-fit items-center gap-2 border-b border-white pb-1 font-['El_Messiri'] text-[18px] text-white transition-colors duration-300 hover:text-white/70"
                 >
                   Learn More
+                  <span aria-hidden className="text-[16px] leading-none">
+                    &gt;
+                  </span>
                 </Link>
               </motion.div>
             </motion.div>

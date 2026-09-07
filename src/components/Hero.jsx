@@ -13,7 +13,7 @@ const slides = [
   },
   {
     id: 2,
-    title: "MATIHA BOUTIQUE",
+    title: "MAITHA'S SPA",
     image: "/assets/ms4.png",
     link: "/projects/2",
   },
@@ -54,7 +54,7 @@ export default function HeroSection() {
               className="h-full w-full object-cover object-center"
               sizes="100vw"
               fill
-              priority
+              priority={current === 0}
             />
           </div>
           <div className="absolute inset-0 hidden md:block">
@@ -64,7 +64,7 @@ export default function HeroSection() {
               className="h-full w-full object-cover object-center"
               sizes="100vw"
               fill
-              priority
+              priority={current === 0}
             />
           </div>
         </motion.div>

@@ -23,8 +23,8 @@ export const projects = [
   },
   {
     id: 2,
-    title: "MAITHA BOUTIQUE",
-    breadcrumb: "HOME / PROJECTS / MAITHA BOUTIQUE",
+    title: "MAITHA'S SPA",
+    breadcrumb: "HOME / PROJECTS / MAITHA'S SPA",
     heroImage: "/assets/ms.png",
     mainImage: "/assets/ms.png",
     state: "AL BATINAH",
@@ -32,10 +32,10 @@ export const projects = [
     area: "75 M³",
     designImages: ["/assets/ms2.png", "/assets/ms3.png"],
     story:
-      "A modern boutique designed to emphasize the merchandise with a minimal yet elegant interior.",
+      "A calm spa retreat with soft seating, warm light, and refined finishes for a restorative guest experience.",
     wideImage: "/assets/ms4.png",
     approach:
-      "Soft lighting and sculptural display elements create a luxurious shopping atmosphere.",
+      "We shaped a serene wellness interior where comfort, privacy, and soft lighting support every treatment moment.",
     category: "Interior Fit-Outs",
   },
   {

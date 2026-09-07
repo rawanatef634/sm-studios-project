@@ -26,40 +26,36 @@ export default function ProjectsPage() {
 
   return (
     <>
-      {/* Hero section */}
       <HeroSection
         title="OUR PROJECTS"
         breadcrumb="HOME / PROJECTS"
         backgroundImage="/assets/contact.jpg"
       />
 
-      {/* LATEST PROJECTS */}
-      <section className="bg-[#161B1E] py-20">
-        <div className="max-w-6xl mx-auto px-6 md:px-10">
-          <h2 className="font-['El_Messiri'] text-4xl font-semibold mb-10 text-center text-white">
-            Latest Projects
-          </h2>
-
-          {/* Category Tabs */}
-          <div className="flex flex-wrap justify-center gap-6 mb-12">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`pb-2 text-sm md:text-base tracking-wide border-b-2 transition 
-                  ${
-                    selectedCategory === cat
-                      ? "text-white border-white"
-                      : "text-gray-400 border-transparent hover:text-white hover:border-white/60"
+      <section className="bg-[#161B1E] py-16 md:py-20">
+        <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+          {/* Category filters — no "Latest Projects" subheader */}
+          <div className="mb-12 flex flex-wrap justify-center gap-3 md:gap-4">
+            {categories.map((cat) => {
+              const active = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 font-['El_Messiri'] text-sm tracking-wide transition md:px-5 md:text-base ${
+                    active
+                      ? "bg-white text-black"
+                      : "bg-transparent text-gray-400 hover:text-white"
                   }`}
-              >
-                {cat}
-              </button>
-            ))}
+                >
+                  {cat}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Projects Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
             {filteredProjects.map((proj, i) => (
               <motion.div
                 key={proj.id}
@@ -72,35 +68,32 @@ export default function ProjectsPage() {
                   delay: Math.min(i * 0.06, 0.36),
                 }}
               >
-              <Link
-                to={`/projects/${proj.id}`}
-                className="group block overflow-hidden shadow-lg hover:shadow-2xl transition duration-500"
-              >
-                <div className="relative">
-                  <OptimizedImage
-                    src={proj.img || proj.heroImage || proj.mainImage}
-                    alt={`${proj.title} preview`}
-                    className="w-full h-[350px] object-cover transform group-hover:scale-110 transition duration-500 ease-out"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition duration-300" />
-                  <h3 className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white text-xl font-medium tracking-wide opacity-0 group-hover:opacity-100 transition duration-300">
-                    {proj.title}
-                  </h3>
-                </div>
-              </Link>
+                <Link
+                  to={`/projects/${proj.id}`}
+                  className="group block overflow-hidden shadow-lg transition duration-500 hover:shadow-2xl"
+                >
+                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                    <OptimizedImage
+                      src={proj.img || proj.heroImage || proj.mainImage}
+                      alt={`${proj.title} preview`}
+                      className="h-full w-full object-cover transition duration-500 ease-out group-hover:scale-110"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      fill
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent transition duration-300" />
+                    <h3 className="absolute bottom-5 left-1/2 w-[90%] -translate-x-1/2 text-center font-['El_Messiri'] text-lg font-medium tracking-wide text-white md:text-xl">
+                      {proj.title}
+                    </h3>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
       <ContactSection />
-
-      {/* FOOTER */}
       <Footer />
     </>
   );
 }
- 

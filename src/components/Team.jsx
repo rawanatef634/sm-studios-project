@@ -53,7 +53,7 @@ export default function Team() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading */}
         <motion.p
-          className="uppercase tracking-[0.16em] text-sm font-['El_Messiri'] text-[#8b9199] mb-2 text-center md:text-left"
+          className="uppercase tracking-normal text-lg md:text-[20px] font-['El_Messiri'] font-semibold text-[#505050] mb-2 text-center md:text-left"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -63,7 +63,7 @@ export default function Team() {
         </motion.p>
 
         <motion.h2
-          className="font-['El_Messiri'] text-2xl md:text-4xl font-semibold text-gray-900 mb-12 max-w-3xl text-center md:text-left mx-auto md:mx-0"
+          className="font-['El_Messiri'] text-3xl md:text-5xl font-semibold text-gray-900 mb-12 max-w-6xl"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
@@ -91,15 +91,15 @@ export default function Team() {
           {teamMembers.map((member) => (
             <motion.div
               key={member.name}
-              className="group text-center w-full md:w-60"
+              className="group text-left w-full md:w-70"
               variants={{
                 hidden: { opacity: 0, y: 60 },
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.7, ease: "easeOut" }}
             >
-              {/* Image — tighter crop (closer portrait) */}
-              <div className="w-full aspect-square md:w-60 md:h-60 mx-auto mb-3 md:mb-6 overflow-hidden rounded-t-[12px]">
+              {/* Image — sharp edges, proportional to name below */}
+              <div className="w-full aspect-square md:w-60 md:h-60 mx-auto mb-3 md:mb-5 overflow-hidden rounded-none">
                 <img
                   src={member.image}
                   alt={member.name}
@@ -112,9 +112,9 @@ export default function Team() {
                 />
               </div>
 
-              {/* Text */}
+              {/* Text — sized to read as proportional to the photo */}
               <div>
-                <h3 className="text-sm md:text-lg font-['El_Messiri'] text-gray-900">
+                <h3 className="text-[17px] leading-tight md:text-[22px] font-['El_Messiri'] text-gray-900">
                   <span className="font-bold">{member.name.split(" ")[0]}</span>
                   {member.name.split(" ").length > 1 && (
                     <span className="font-normal">
@@ -123,7 +123,7 @@ export default function Team() {
                     </span>
                   )}
                 </h3>
-                <p className="mb-4 mt-1 text-xs md:text-sm font-['El_Messiri'] text-gray-500">
+                <p className="mb-4 mt-1.5 text-[13px] md:text-[15px] font-['El_Messiri'] text-gray-500">
                   {member.role}
                 </p>
               </div>

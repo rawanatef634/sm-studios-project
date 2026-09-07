@@ -8,7 +8,17 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-   server: {
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'motion': ['framer-motion'],
+        },
+      },
+    },
+  },
+  server: {
     allowedHosts: [
       'tinily-promodern-lahoma.ngrok-free.dev',
       "warm-cooks-invent.loca.lt"

@@ -14,7 +14,7 @@ export default function Services() {
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full">
           <div>
-            <span className="uppercase tracking-[0.16em] font-['El_Messiri'] text-[#8b9199] text-sm md:text-2xl">
+            <span className="uppercase tracking-normal font-['El_Messiri'] font-semibold text-[#505050] text-lg md:text-[28px]">
               Our Expertise
             </span>
             <h2 className="font-['El_Messiri'] text-2xl md:text-5xl font-semibold mt-2 text-[#111111] max-md:uppercase max-md:leading-tight">

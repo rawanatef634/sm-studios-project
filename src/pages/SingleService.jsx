@@ -35,28 +35,36 @@ export default function SingleService() {
 
       <div className="bg-[#161B1E] text-white">
         {/* About */}
-        <section className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-20 items-center">
-          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="text-2xl md:text-[24px] text-gray-400 font-semibold mb-4 uppercase">
+        <section className="mx-auto grid max-w-[1400px] items-center gap-12 px-6 py-16 md:grid-cols-2 md:gap-16 md:px-12 lg:gap-20">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="mb-4 text-2xl font-semibold uppercase text-gray-400 md:text-[24px]">
               About This Service
-              <div className="border-b mt-5 border-gray-700 w-70"></div>
+              <div className="mt-5 w-70 border-b border-gray-700"></div>
             </h2>
-            <p className=" leading-relaxed md:text-[24px]">{service.about}</p>
+            <p className="leading-relaxed md:text-[24px]">{service.about}</p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
             <img
               src={service.image}
               alt={service.title}
-              className="w-full h-[350px] object-cover"
+              className="h-[350px] w-full object-cover md:h-[420px]"
             />
           </motion.div>
         </section>
 
         {/* Process */}
-        <section className="max-w-7xl mx-auto px-6 py-16">
+        <section className="mx-auto max-w-[1400px] px-6 py-16 md:px-12">
           <motion.h2
-            className="text-2xl md:text-3xl font-semibold mb-10 text-gray-400"
+            className="mb-10 text-2xl font-semibold text-gray-400 md:text-3xl"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -67,16 +75,15 @@ export default function SingleService() {
         </section>
 
         {/* Sub Services Accordion */}
-        <section className="max-w-7xl mx-auto px-6 py-16">
+        <section className="mx-auto max-w-[1400px] px-6 py-16 md:px-12">
           <motion.h2
-            className="text-2xl md:text-[24px] font-semibold mb-10 text-gray-400"
+            className="mb-10 text-2xl font-semibold text-gray-400 md:text-[24px]"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
             SUB SERVICES
-            <div className="border-b mt-5 border-gray-700 w-70"></div>
-
+            <div className="mt-5 w-70 border-b border-gray-700"></div>
           </motion.h2>
           <Accordion items={service.subServices} />
         </section>

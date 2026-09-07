@@ -15,12 +15,10 @@ function normalizeProjects(data) {
 }
 
 export function ProjectsProvider({ children }) {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState(seedProjects);
+  const loading = false;
 
-  // Fetch projects from the server on mount.
-  // If the API fails (common when Blob env is missing on Vercel), fall back to
-  // the bundled seed so the public site never shows an empty portfolio.
+  // Refresh from the server in the background. Keep seed on failure / empty.
   useEffect(() => {
     let cancelled = false;
 
@@ -37,25 +35,14 @@ export function ProjectsProvider({ children }) {
         return list;
       })
       .then((list) => {
-        if (cancelled) return;
-        if (list.length === 0) {
-          console.warn(
-            "[ProjectsContext] API returned 0 projects — using bundled seed.",
-          );
-          setProjects(seedProjects);
-          return;
-        }
+        if (cancelled || list.length === 0) return;
         setProjects(list);
       })
       .catch((err) => {
         console.warn(
-          "[ProjectsContext] Falling back to bundled seed:",
+          "[ProjectsContext] Keeping bundled seed:",
           err.message,
         );
-        if (!cancelled) setProjects(seedProjects);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
       });
 
     return () => {
