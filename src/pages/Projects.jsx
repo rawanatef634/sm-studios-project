@@ -33,7 +33,8 @@ export default function ProjectsPage() {
       />
 
       <section className="bg-[#161B1E] py-16 md:py-20">
-        <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+        <div className="w-full px-6 md:px-12">
+          {" "}
           {/* Category filters — no "Latest Projects" subheader */}
           <div className="mb-12 flex flex-wrap justify-center gap-3 md:gap-4">
             {categories.map((cat) => {
@@ -54,7 +55,6 @@ export default function ProjectsPage() {
               );
             })}
           </div>
-
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
             {filteredProjects.map((proj, i) => (
               <motion.div

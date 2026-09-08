@@ -7,7 +7,8 @@ import { useProjects } from "../context/ProjectsContext";
 
 const AUTO_MS = 5000;
 const EASE = [0.22, 1, 0.36, 1];
-const DURATION = 0.55;
+
+const DURATION = 0.9;
 
 function projectImage(project) {
   return project.img || project.heroImage || project.mainImage;
@@ -29,57 +30,87 @@ function Caption({ project }) {
  * Fixed slots (no layout morph). Images crossfade + scale in place —
  * avoids the glitchy left/width/aspectRatio animation.
  */
-function ProjectCard({ project, variant, direction }) {
+function ProjectCard({ project, variant }) {
   const isCenter = variant === "center";
-  const enterX = direction >= 0 ? 18 : -18;
-  const exitX = direction >= 0 ? -18 : 18;
 
   return (
-    <div className="min-w-0">
-      <div
+    <motion.div
+      layout
+      layoutId={`project-${project.id}`}
+      className="min-w-0"
+      transition={{
+        layout: {
+          duration: DURATION,
+          ease: EASE,
+        },
+      }}
+    >
+      <motion.div
+        layout
         className={`relative w-full overflow-hidden ${
           isCenter ? "aspect-[6/5]" : "aspect-[7/9]"
         }`}
+        transition={{
+          layout: {
+            duration: DURATION,
+            ease: EASE,
+          },
+        }}
       >
-        <AnimatePresence initial={false} mode="sync" custom={direction}>
+        <Link to={`/projects/${project.id}`} className="absolute inset-0 block">
           <motion.div
-            key={project.id}
             className="absolute inset-0"
-            custom={direction}
-            initial={{ opacity: 0, scale: 1.06, x: enterX }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.98, x: exitX }}
-            transition={{ duration: DURATION, ease: EASE }}
+            animate={{
+              scale: isCenter ? 1 : 0.985,
+            }}
+            transition={{
+              duration: DURATION,
+              ease: EASE,
+            }}
           >
-            <Link
-              to={`/projects/${project.id}`}
-              className="absolute inset-0 block"
-            >
-              <OptimizedImage
-                src={projectImage(project)}
-                alt={project.title}
-                className="h-full w-full object-cover"
-                sizes={
-                  isCenter
-                    ? "(max-width: 1200px) 48vw, 640px"
-                    : "(max-width: 1200px) 24vw, 300px"
-                }
-                fill
-                priority={isCenter}
-              />
-            </Link>
+            <OptimizedImage
+              src={projectImage(project)}
+              alt={project.title}
+              className="h-full w-full object-cover"
+              sizes={
+                isCenter
+                  ? "(max-width: 1200px) 48vw, 640px"
+                  : "(max-width: 1200px) 24vw, 300px"
+              }
+              fill
+              priority={isCenter}
+            />
           </motion.div>
-        </AnimatePresence>
-      </div>
+        </Link>
+      </motion.div>
 
-      <div className="mt-2.5 min-h-[3.5rem]">
+      {/* Metadata */}
+      <motion.div
+        layout
+        className="mt-2.5 min-h-[3.5rem]"
+        transition={{
+          layout: {
+            duration: DURATION,
+            ease: EASE,
+          },
+        }}
+      >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={`${project.id}-${variant}-meta`}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+              y: -6,
+            }}
+            transition={{
+              duration: 0.35,
+              ease: "easeOut",
+            }}
           >
             {variant === "side-left" && (
               <p className="font-['El_Messiri'] text-[13px] leading-[1.35] text-[#a1a1a1]">
@@ -92,6 +123,7 @@ function ProjectCard({ project, variant, direction }) {
                 <h3 className="font-['El_Messiri'] text-[32px] leading-[0.95] text-white md:text-[42px]">
                   {project.title}
                 </h3>
+
                 <p className="max-w-[250px] pt-1 font-['El_Messiri'] text-[13px] leading-[1.35] text-[#9c9c9c]">
                   {Caption({ project })}
                 </p>
@@ -105,22 +137,181 @@ function ProjectCard({ project, variant, direction }) {
             )}
           </motion.div>
         </AnimatePresence>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
-function DesktopStage({ projects, index, direction }) {
+function DesktopStage({ projects, index }) {
   const n = projects.length;
-  const left = projects[wrapIndex(index - 1, n)];
-  const center = projects[wrapIndex(index, n)];
-  const right = projects[wrapIndex(index + 1, n)];
+
+  const getOffset = (projectIndex) => {
+    const leftIndex = wrapIndex(index - 1, n);
+    const centerIndex = wrapIndex(index, n);
+    const rightIndex = wrapIndex(index + 1, n);
+
+    if (projectIndex === leftIndex) return -1;
+    if (projectIndex === centerIndex) return 0;
+    if (projectIndex === rightIndex) return 1;
+
+    let diff = projectIndex - index;
+
+    if (diff > n / 2) diff -= n;
+    if (diff < -n / 2) diff += n;
+
+    return diff < 0 ? -2 : 2;
+  };
+
+  const getPosition = (offset) => {
+    // LEFT
+    if (offset === -1) {
+      return {
+        left: "0%",
+        width: "24%",
+        height: "470px",
+        opacity: 1,
+        scale: 1,
+        zIndex: 2,
+      };
+    }
+
+    // CENTER
+    if (offset === 0) {
+      return {
+        left: "25.5%",
+        width: "49%",
+        height: "570px",
+        opacity: 1,
+        scale: 1,
+        zIndex: 5,
+      };
+    }
+
+    // RIGHT
+    if (offset === 1) {
+      return {
+        left: "76%",
+        width: "24%",
+        height: "470px",
+        opacity: 1,
+        scale: 1,
+        zIndex: 2,
+      };
+    }
+
+    // HIDDEN LEFT
+    if (offset < -1) {
+      return {
+        left: "-26%",
+        width: "24%",
+        height: "470px",
+        opacity: 0,
+        scale: 0.96,
+        zIndex: 0,
+      };
+    }
+
+    // HIDDEN RIGHT
+    return {
+      left: "102%",
+      width: "24%",
+      height: "470px",
+      opacity: 0,
+      scale: 0.96,
+      zIndex: 0,
+    };
+  };
 
   return (
-    <div className="hidden grid-cols-[minmax(0,0.95fr)_minmax(0,1.85fr)_minmax(0,0.95fr)] items-start gap-6 px-4 md:grid md:px-20">
-      <ProjectCard project={left} variant="side-left" direction={direction} />
-      <ProjectCard project={center} variant="center" direction={direction} />
-      <ProjectCard project={right} variant="side-right" direction={direction} />
+    <div className="relative hidden h-[650px] w-full overflow-hidden md:block">
+      {projects.map((project, projectIndex) => {
+        const offset = getOffset(projectIndex);
+        const position = getPosition(offset);
+
+        const isLeft = offset === -1;
+        const isCenter = offset === 0;
+        const isRight = offset === 1;
+
+        return (
+          <motion.div
+            key={project.id}
+            className="absolute top-0"
+            initial={false}
+            animate={position}
+            transition={{
+              duration: 0.9,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            style={{
+              pointerEvents:
+                isLeft || isCenter || isRight ? "auto" : "none",
+            }}
+          >
+            <Link
+              to={`/projects/${project.id}`}
+              className="block h-full w-full"
+            >
+              <div className="relative h-full w-full overflow-hidden">
+                <OptimizedImage
+                  src={projectImage(project)}
+                  alt={project.title}
+                  className="h-full w-full object-cover"
+                  sizes={isCenter ? "49vw" : "24vw"}
+                  fill
+                  priority={isCenter}
+                />
+              </div>
+            </Link>
+
+            <AnimatePresence mode="wait">
+              {isCenter && (
+                <motion.div
+                  key={`center-${project.id}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="mt-3 flex items-start justify-between gap-6"
+                >
+                  <h3 className="font-['El_Messiri'] text-[42px] leading-[0.95] text-white">
+                    {project.title}
+                  </h3>
+
+                  <p className="max-w-[250px] font-['El_Messiri'] text-[13px] leading-[1.4] text-[#9c9c9c]">
+                    {Caption({ project })}
+                  </p>
+                </motion.div>
+              )}
+
+              {isLeft && (
+                <motion.p
+                  key={`left-${project.id}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="mt-3 font-['El_Messiri'] text-[13px] leading-[1.4] text-[#a1a1a1]"
+                >
+                  {Caption({ project })}
+                </motion.p>
+              )}
+
+              {isRight && (
+                <motion.h3
+                  key={`right-${project.id}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="mt-3 font-['El_Messiri'] text-[38px] leading-none text-white"
+                >
+                  {project.title}
+                </motion.h3>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        );
+      })}
     </div>
   );
 }
@@ -183,9 +374,9 @@ export default function PortfolioCarousel() {
       setIndex(wrapIndex(next, n));
       window.setTimeout(() => {
         busyRef.current = false;
-      }, DURATION * 1000 + 50);
+      }, 950);
     },
-    [n]
+    [n],
   );
 
   const goPrev = useCallback(() => goTo(index - 1, -1), [goTo, index]);
@@ -214,8 +405,7 @@ export default function PortfolioCarousel() {
 
   return (
     <section className="bg-[#161B1E] text-white">
-      <div className="mx-auto w-full max-w-8xl pb-12 pt-11 md:pb-16 md:pt-12">
-        <div className="mb-10 flex items-start justify-between gap-6 px-4 md:mb-12 md:px-20">
+<div className="w-full pb-12 pt-11 md:pb-16 md:pt-12">        <div className="mb-10 flex items-start justify-between gap-6 px-4 md:mb-12 md:px-20">
           <div className="max-w-[40rem]">
             <p className="mb-3 font-['El_Messiri'] text-[16px] font-medium uppercase tracking-[0.16em] text-white">
               Our Portfolio
@@ -260,11 +450,7 @@ export default function PortfolioCarousel() {
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
         >
-          <DesktopStage
-            projects={projects}
-            index={index}
-            direction={direction}
-          />
+          <DesktopStage projects={projects} index={index} />
           <MobileStage
             projects={projects}
             index={index}

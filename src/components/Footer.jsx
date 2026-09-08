@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import SocialLinks from "./SocialLinks";
-
+// make rule even more lighter grey
 /** Sampled from Figma footer reference */
 const BG = "#191F22";
 const LABEL = "#8CACB6";
 const LINK = "#738E96";
 const BODY = "#8E9192";
-const RULE = "#525759";
+const RULE = "#242D32";
 const ARROW = "#CAC9C4";
 
 function BackToTopArrow({ className }) {
@@ -38,7 +38,15 @@ function BackToTopArrow({ className }) {
 function SectionLabel({ children }) {
   return (
     <h4
-      className="mb-3 border-t pt-3 font-['El_Messiri'] text-[11px] uppercase tracking-[0.18em]"
+      className="mb-3 border-b pb-3 text-[13px] uppercase tracking-[0.18em]"
+      style={{ color: LABEL, borderColor: RULE, borderBottomWidth: "1px" }}
+    >
+      {children}
+    </h4>
+  );
+  return (
+    <h4
+      className="mb-3 border-b pb-3 font-['El_Messiri'] text-[11px] uppercase tracking-[0.18em]"
       style={{ color: LABEL, borderColor: RULE }}
     >
       {children}
@@ -49,35 +57,36 @@ function SectionLabel({ children }) {
 export default function Footer() {
   return (
     <footer className="text-white" style={{ backgroundColor: BG }}>
-      <div className="mx-auto max-w-[1400px] px-6 py-14 md:px-14 md:py-16 lg:px-20">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:min-h-[260px] md:items-stretch md:gap-x-16 lg:gap-x-24">
+      <div className="max-w-[1512px] mx-auto px-14 py-14 md: md:py-16">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:min-h-[400px] md:items-stretch md:gap-x-16 lg:gap-x-24">
           {/* Brand + large back-to-top */}
-          <div className="flex flex-row items-start justify-between md:flex-col md:items-start">
+          <div className="text-center flex flex-row items-start justify-between md:flex-col md:items-center">
+            {" "}
             <div>
               <img
                 src="/assets/sm-logo.png"
                 alt="SM Studio Logo"
-                className="mb-3 w-[68px] md:w-[76px]"
+                className="mb-3 w-[68px] md:w-[76px] mx-auto"
               />
               <p className="font-['El_Messiri'] text-[24px] leading-none tracking-[0.04em] text-white md:text-[28px]">
                 SM STUDIO
               </p>
-              <p
-                className="mt-1.5 font-['El_Messiri'] text-[10px] tracking-[0.28em]"
-                style={{ color: BODY }}
-              >
+              <p className="mt-1.5 font-['El_Messiri'] text-[17px]">
                 +PARTNERS
               </p>
             </div>
-
             <button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="mt-0 shrink-0 transition hover:opacity-80 md:mt-auto md:pt-16"
+              className="cursor-pointer mt-0 shrink-0 transition hover:opacity-80 md:mt-auto md:pt-16"
               style={{ color: ARROW }}
               aria-label="Back to top"
             >
-              <BackToTopArrow className="h-[88px] w-[72px] md:h-[108px] md:w-[92px]" />
+              <img
+                src="/assets/image.png"
+                alt="Back to top"
+                className="h-[60px] md:h-[88px]"
+              />
             </button>
           </div>
 
@@ -96,8 +105,8 @@ export default function Footer() {
                 Our Services
               </Link>
               <span className="px-2 opacity-50">/</span>
-              <Link to="/#about" className="transition hover:text-white">
-                About Us
+              <Link to="/#careers" className="transition hover:text-white">
+                Careers
               </Link>
               <br className="hidden md:block" />
               <span className="px-2 opacity-50 md:pl-0">/</span>
@@ -109,7 +118,7 @@ export default function Footer() {
                 Contact
               </Link>
             </nav>
-
+            <div className="sm:h-15 h-0"></div>
             <SectionLabel>Location:</SectionLabel>
             <p
               className="max-w-[300px] font-['El_Messiri'] text-[15px] leading-relaxed md:text-[16px]"
@@ -130,15 +139,15 @@ export default function Footer() {
               <p>+968 2412 8488</p>
               <p>+968 78444636</p>
             </div>
-
+            <div className="sm:h-15 h-0"></div>
             <SocialLinks
-              className="mt-7 flex justify-start gap-3"
+              className="mt-7 flex gap-3 justify-end"
               itemClassName="flex h-9 w-9 items-center justify-center rounded-full border border-[#525759] text-white transition hover:border-[#8E9192]"
               iconClassName="h-4 w-4"
             />
 
             <p
-              className="mt-10 font-['El_Messiri'] text-[10px] uppercase tracking-[0.16em] md:mt-auto md:pt-10 md:text-right"
+              className="mt-10 text-[15px] uppercase tracking-[0.16em] md:mt-auto md:pt-10 md:text-right"
               style={{ color: BODY }}
             >
               © 2025 SM STUDIOS. ALL RIGHTS RESERVED.

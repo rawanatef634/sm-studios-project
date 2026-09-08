@@ -38,7 +38,8 @@ export default function ServicesPage() {
 
       {/* Services Section */}
       <section className="bg-[#161B1E] text-white py-28 md:py-32 overflow-x-hidden">
-        <div className="max-w-[1400px] mx-auto px-3 md:px-12 space-y-32">
+        <div className="w-full px-6 md:px-12 space-y-32">
+          {" "}
           {services.map((service, idx) => (
             <motion.div
               key={service.id}
@@ -152,7 +153,7 @@ export default function ServicesPage() {
           </motion.div>
 
           {/* Projects Grid */}
-         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {filteredProjects.map((proj) => (
               <Link
                 to={`/projects/${proj.id}`}

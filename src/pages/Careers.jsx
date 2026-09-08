@@ -145,7 +145,7 @@ const Careers = () => {
           viewport={{ once: true }}
           variants={fadeUp}
         >
-          <p className="max-w-6xl mx-auto text-[24px] font-['El_Messiri'] font-light lg:text-[32px]">
+          <p className="w-full px-6 md:px-8 text-[24px] font-['El_Messiri'] font-light lg:text-[32px]">
             We don't have any open positions right now, but we'd love to stay
             connected. You can send us your CV and we'll reach out when
             opportunities arise.
@@ -160,7 +160,7 @@ const Careers = () => {
           viewport={{ once: true }}
           variants={fadeUp}
         >
-          <form onSubmit={handleSubmit} className="w-full max-w-4xl space-y-6">
+          <form onSubmit={handleSubmit} className="w-full max-w-7xl space-y-6">
             {/* Personal Info Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

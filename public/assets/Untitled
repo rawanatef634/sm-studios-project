@@ -1,0 +1,21 @@
+{/* Pattern strip — right side only */}
+<div
+  className="pointer-events-none absolute right-0 top-0 hidden h-full w-[160px] md:block"
+  style={{
+    backgroundColor: "#0C1517",
+
+    WebkitMaskImage: "url('/assets/pattern.png')",
+    maskImage: "url('/assets/pattern.png')",
+
+    // Larger value = pattern is more zoomed in
+    WebkitMaskSize: "420px auto",
+    maskSize: "420px auto",
+
+    WebkitMaskRepeat: "repeat-y",
+    maskRepeat: "repeat-y",
+
+    WebkitMaskPosition: "center top",
+    maskPosition: "center top",
+  }}
+  aria-hidden="true"
+/>

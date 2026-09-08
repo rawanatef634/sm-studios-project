@@ -113,17 +113,14 @@ export default function Team() {
               </div>
 
               {/* Text — sized to read as proportional to the photo */}
-              <div>
-                <h3 className="text-[17px] leading-tight md:text-[22px] font-['El_Messiri'] text-gray-900">
-                  <span className="font-bold">{member.name.split(" ")[0]}</span>
+              <div className="text-center">
+                <h3 className="font-bold text-[17px] leading-tight md:text-[25px] font-['El_Messiri'] text-gray-900">
+                  <span>{member.name.split(" ")[0]}</span>
                   {member.name.split(" ").length > 1 && (
-                    <span className="font-normal">
-                      {" "}
-                      {member.name.split(" ").slice(1).join(" ")}
-                    </span>
+                    <span> {member.name.split(" ").slice(1).join(" ")}</span>
                   )}
                 </h3>
-                <p className="mb-4 mt-1.5 text-[13px] md:text-[15px] font-['El_Messiri'] text-gray-500">
+                <p className="mb-4 mt-1.5 text-[13px] md:text-[18px] font-['El_Messiri'] text-gray-600">
                   {member.role}
                 </p>
               </div>

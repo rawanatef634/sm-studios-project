@@ -103,14 +103,15 @@ const Contact = () => {
           viewport={{ once: true }}
           variants={fadeUp}
         >
-          <p className="max-w-6xl mx-auto md:text-[32px] font-['El_Messiri'] font-light">
-            Let's discuss your next project. Our team is ready to bring your ideas to life.
+          <p className="w-full px-6 md:px-8 md:text-[32px] font-['El_Messiri'] font-light">
+            Let's discuss your next project. Our team is ready to bring your
+            ideas to life.
           </p>
         </motion.section>
 
         {/* Form + Map */}
         <section className="text-white py-16 px-6">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="w-full px-6 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Map */}
             <motion.div
               className="w-full h-[500px] overflow-hidden shadow-lg"
@@ -173,9 +174,11 @@ const Contact = () => {
               ></textarea>
 
               {status && (
-                <p className={`text-sm mt-2 text-center ${
-                  status.includes("✅") ? "text-green-400" : "text-red-400"
-                }`}>
+                <p
+                  className={`text-sm mt-2 text-center ${
+                    status.includes("✅") ? "text-green-400" : "text-red-400"
+                  }`}
+                >
                   {status}
                 </p>
               )}
