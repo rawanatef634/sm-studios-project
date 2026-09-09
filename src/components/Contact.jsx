@@ -27,10 +27,10 @@ export default function ContactSection() {
           </p>
         </div>
 
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 ">
           <Link
             to="/contact"
-            className="relative inline-flex items-center gap-3 bg-transparent px-10 py-4 font-['El_Messiri'] text-lg font-light uppercase tracking-[0.14em] text-white transition-opacity duration-300 hover:opacity-80 md:px-12 md:py-5 md:text-[20px]"
+            className="relative inline-flex items-center gap-3 bg-transparent px-10 py-4 font-['El_Messiri'] text-lg font-medium tracking-[0.08em] text-white transition-opacity duration-300 hover:opacity-80 md:px-5 md:py-5 md:text-[28px]"
           >
             {/* Full outline with bottom-right cut — transparent fill */}
             <svg

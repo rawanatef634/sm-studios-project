@@ -14,7 +14,7 @@ export default function About() {
         aria-hidden="true"
       >
         <div
-className="absolute left-1/2 top-1/2 h-[1500px] w-[1500px]
+          className="absolute left-1/2 top-1/2 h-[1500px] w-[1500px]
            -translate-x-[45%] -translate-y-1/2 rotate-90"
           style={{
             backgroundColor: "#101719",
@@ -171,7 +171,6 @@ className="absolute left-1/2 top-1/2 h-[1500px] w-[1500px]
                 duration-300
                 hover:bg-white
                 hover:text-black
-                md:rounded-md
                 md:px-8
                 md:text-[26px]
               "

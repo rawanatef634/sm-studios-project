@@ -243,8 +243,7 @@ function DesktopStage({ projects, index }) {
               ease: [0.22, 1, 0.36, 1],
             }}
             style={{
-              pointerEvents:
-                isLeft || isCenter || isRight ? "auto" : "none",
+              pointerEvents: isLeft || isCenter || isRight ? "auto" : "none",
             }}
           >
             <Link
@@ -405,19 +404,21 @@ export default function PortfolioCarousel() {
 
   return (
     <section className="bg-[#161B1E] text-white">
-<div className="w-full pb-12 pt-11 md:pb-16 md:pt-12">        <div className="mb-10 flex items-start justify-between gap-6 px-4 md:mb-12 md:px-20">
+      <div className="w-full pb-12 pt-11 md:pb-16 md:pt-12">
+        {" "}
+        <div className="mb-10 flex items-start justify-between gap-6 px-4 md:mb-12 md:px-20">
           <div className="max-w-[40rem]">
-            <p className="mb-3 font-['El_Messiri'] text-[16px] font-medium uppercase tracking-[0.16em] text-white">
+            <p className="mb-7 font-['El_Messiri'] text-[20px] font-medium uppercase tracking-[0.16em] text-white">
               Our Portfolio
             </p>
-            <h2 className="font-['El_Messiri'] text-[45px] font-semibold leading-[0.95] tracking-[0.005em] uppercase max-md:text-3xl">
+            <h2 className="font-['El_Messiri'] text-[50px] font-bold leading-[0.95] tracking-[0.01em] uppercase max-md:text-3xl">
               A Showcase of
               <br />
               Elegance and Detail
             </h2>
             <Link
               to="/projects"
-              className="mt-5 inline-flex items-center gap-2 border-b border-white/70 pb-0.5 font-['El_Messiri'] text-[18px] font-medium text-white"
+              className="mt-7 inline-flex items-center gap-2 border-b border-white/70 pb-0.5 font-['El_Messiri'] text-[18px] font-medium text-white"
             >
               Explore more Projects
               <ArrowUpRight size={16} strokeWidth={1.1} className="shrink-0" />
@@ -443,7 +444,6 @@ export default function PortfolioCarousel() {
             </button>
           </div>
         </div>
-
         <div
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
