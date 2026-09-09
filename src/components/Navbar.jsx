@@ -44,19 +44,19 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex justify-between items-center px-5 py-5 md:px-8 md:py-8">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <img src="/assets/sm-logo.png" alt="Logo" className="h-10 w-auto" />
+          <img src="/assets/sm-logo.png" alt="Logo" className="h-12 w-auto" />
           <div className="block">
-            <h1 className="px-2 text-white text-lg font-['El_Messiri'] tracking-[0.04em]">
+            <h1 className="px-2 text-white text-xl font-['El_Messiri'] tracking-[0.04em]">
               SM STUDIO
             </h1>
-            <h2 className="px-2 text-white text-[11px] font-['El_Messiri'] tracking-[0.18em]">
+            <h2 className="px-2 text-white text-[15px] font-['El_Messiri']">
               +PARTNERS
             </h2>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-10 text-white text-sm font-['El_Messiri'] tracking-[0.14em] uppercase">
+        <nav className="hidden md:flex items-center space-x-10 text-white text-sm tracking-[0.14em] uppercase">
           <Link to="/projects" className="hover:opacity-80 transition">
             Projects
           </Link>
@@ -196,7 +196,7 @@ const Navbar = () => {
       {/* Mobile dropdown menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-white/10 bg-[#161B1E]">
-          <nav className="flex flex-col px-6 py-2 text-white font-['El_Messiri']">
+          <nav className="flex flex-col px-6 py-2 text-white">
             <Link
               to="/projects"
               className="border-b border-white/10 py-4 text-[15px] tracking-[0.16em] uppercase"
