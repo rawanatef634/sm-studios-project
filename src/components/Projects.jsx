@@ -316,7 +316,7 @@ function DesktopStage({ projects, index }) {
 }
 
 function MobileStage({ projects, index, direction }) {
-  const center = projects[index];
+  const center = projects[wrapIndex(index, projects.length)];
   const enterX = direction >= 0 ? 24 : -24;
   const exitX = direction >= 0 ? -24 : 24;
 
@@ -370,7 +370,7 @@ export default function PortfolioCarousel() {
       if (busyRef.current || n < 2) return;
       busyRef.current = true;
       setDirection(dir);
-      setIndex(next);
+      setIndex(wrapIndex(next, n));
       window.setTimeout(() => {
         busyRef.current = false;
       }, 950);
