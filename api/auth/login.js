@@ -1,4 +1,3 @@
-import "../_utils/heronsignal.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookieAttrs, readJsonBody } from "../_utils/auth.js";

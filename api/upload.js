@@ -1,4 +1,3 @@
-import "./_utils/heronsignal.js";
 import { randomUUID } from "crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";

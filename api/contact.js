@@ -1,4 +1,3 @@
-import "./_utils/heronsignal.js";
 import {
   CONTACT_TO,
   MailConfigError,

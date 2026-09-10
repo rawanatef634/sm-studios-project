@@ -1,4 +1,3 @@
-import "./_utils/heronsignal.js";
 import { verifySession, readJsonBody } from "./_utils/auth.js";
 import {
   loadProjects,
