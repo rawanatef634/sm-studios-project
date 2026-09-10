@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { captureError, event } from "@heronsignal/web";
 import HeroSection from "../components/HeroSection";
 import Footer from "../components/Footer";
 
@@ -68,6 +69,10 @@ const Contact = () => {
           return;
         }
 
+        event("contact_form_submitted", {
+          projectType: form.project,
+          location: form.location || "unspecified",
+        });
         setStatus("Message sent successfully ✅");
         setForm({
           name: "",
@@ -78,7 +83,8 @@ const Contact = () => {
           area: "",
           requirements: "",
         });
-      } catch {
+      } catch (error) {
+        captureError(error);
         setStatus("Something went wrong ❌");
       } finally {
         setIsSubmitting(false);
