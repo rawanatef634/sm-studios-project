@@ -370,7 +370,7 @@ export default function PortfolioCarousel() {
       if (busyRef.current || n < 2) return;
       busyRef.current = true;
       setDirection(dir);
-      setIndex(next);
+      setIndex(wrapIndex(next, n));
       window.setTimeout(() => {
         busyRef.current = false;
       }, 950);
