@@ -316,7 +316,7 @@ function DesktopStage({ projects, index }) {
 }
 
 function MobileStage({ projects, index, direction }) {
-  const center = projects[index];
+  const center = projects[wrapIndex(index, projects.length)];
   const enterX = direction >= 0 ? 24 : -24;
   const exitX = direction >= 0 ? -24 : 24;
 
