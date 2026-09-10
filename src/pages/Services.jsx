@@ -27,8 +27,6 @@ export default function ServicesPage() {
           .filter((proj) => proj.category === selectedCategory)
           .slice(0, 3);
 
-  const visibleProjects = filteredProjects.filter((proj) => proj?.id != null);
-
   return (
     <>
       {/* Hero */}
@@ -156,7 +154,7 @@ export default function ServicesPage() {
 
           {/* Projects Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {visibleProjects.map((proj) => (
+            {filteredProjects.map((proj) => (
               <Link
                 to={`/projects/${proj.id}`}
                 key={proj.id}
@@ -179,7 +177,7 @@ export default function ServicesPage() {
           </div>
 
           {/* No Results Message */}
-          {visibleProjects.length === 0 && (
+          {filteredProjects.length === 0 && (
             <motion.p
               className="text-gray-400 text-lg mt-12"
               initial={{ opacity: 0 }}
