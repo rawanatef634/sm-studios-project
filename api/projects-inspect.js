@@ -6,6 +6,7 @@
  * Optional: require auth in production-like setups; left public for local
  * diagnostics but never mutates state and never returns secrets.
  */
+import "./_utils/heronsignal.js";
 import { inspectProjectsStore } from "./_utils/projectStore.js";
 import { getBlobTokenSource, hasBlobToken } from "./_utils/blobAuth.js";
 

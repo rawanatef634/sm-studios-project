@@ -1,3 +1,4 @@
+import "../_utils/heronsignal.js";
 import { verifySession } from "../_utils/auth.js";
 
 export default async function handler(req, res) {
