@@ -45,30 +45,36 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (isSubmitting) return;
-
+  
     const validationErrors = validate();
     setErrors(validationErrors);
-
+  
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
       setStatus("");
-
+  
       try {
-        const res = await fetch("/api/contact-1", {
+        const res = await fetch("/api/contact-1?forceError=true", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
         });
+  
         const data = await res.json().catch(() => ({}));
-
+  
         if (!res.ok || !data.ok) {
           if (data.errors) setErrors(data.errors);
-          setStatus(data.error || "Something went wrong ❌");
-          return;
+  
+          throw new Error(
+            data.error || `Contact request failed with status ${res.status}`
+          );
         }
-
+        
+  
         setStatus("Message sent successfully ✅");
+  
         setForm({
           name: "",
           email: "",
@@ -78,7 +84,9 @@ const Contact = () => {
           area: "",
           requirements: "",
         });
-      } catch {
+      } catch (error) {
+        console.error("Contact form submission failed:", error);
+  
         setStatus("Something went wrong ❌");
       } finally {
         setIsSubmitting(false);
