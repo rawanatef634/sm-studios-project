@@ -151,13 +151,6 @@ const Navbar = () => {
           <Link to="/careers" className="hover:opacity-80 transition">
             Careers
           </Link>
-          <Link
-            to="/contact"
-            aria-label="Get quote"
-            className="border border-white/40 px-4 py-2 tracking-[0.14em] uppercase transition hover:bg-white hover:text-black"
-          >
-            Get Quote
-          </Link>
         </nav>
 
         {/* Mobile hamburger button */}
@@ -289,18 +282,10 @@ const Navbar = () => {
             </Link>
             <Link
               to="/careers"
-              className="border-b border-white/10 py-4 text-[15px] tracking-[0.16em] uppercase"
+              className="py-4 text-[15px] tracking-[0.16em] uppercase"
               onClick={() => setMobileOpen(false)}
             >
               Careers
-            </Link>
-            <Link
-              to="/contact"
-              aria-label="Get quote"
-              className="border-b border-white/10 py-4 text-[15px] tracking-[0.16em] uppercase text-white"
-              onClick={() => setMobileOpen(false)}
-            >
-              Get Quote
             </Link>
           </nav>
         </div>
