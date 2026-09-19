@@ -1,3 +1,4 @@
+import "./_utils/heronsignal.js";
 import Busboy from "busboy";
 import {
   CONTACT_TO,

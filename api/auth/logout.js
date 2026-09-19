@@ -1,3 +1,4 @@
+import "../_utils/heronsignal.js";
 import { cookieAttrs } from "../_utils/auth.js";
 
 export default async function handler(req, res) {

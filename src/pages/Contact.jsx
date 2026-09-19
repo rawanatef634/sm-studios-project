@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { captureError, event } from "@heronsignal/web";
 import HeroSection from "../components/HeroSection";
 import Footer from "../components/Footer";
 
@@ -45,36 +46,40 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (isSubmitting) return;
-  
+
     const validationErrors = validate();
     setErrors(validationErrors);
-  
+
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
       setStatus("");
-  
+
       try {
         const res = await fetch("/api/contact-1?forceError=true", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
         });
-  
+
         const data = await res.json().catch(() => ({}));
-  
+
         if (!res.ok || !data.ok) {
           if (data.errors) setErrors(data.errors);
-  
+
           throw new Error(
-            data.error || `Contact request failed with status ${res.status}`
+            data.error || `Contact request failed with status ${res.status}`,
           );
         }
-        
-  
+
+        event("contact_form_submitted", {
+          projectType: form.project,
+          location: form.location || "unspecified",
+        });
+
         setStatus("Message sent successfully ✅");
-  
+
         setForm({
           name: "",
           email: "",
@@ -86,7 +91,8 @@ const Contact = () => {
         });
       } catch (error) {
         console.error("Contact form submission failed:", error);
-  
+        captureError(error);
+
         setStatus("Something went wrong ❌");
       } finally {
         setIsSubmitting(false);
