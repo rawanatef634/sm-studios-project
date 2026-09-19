@@ -57,7 +57,7 @@ const Contact = () => {
       setStatus("");
 
       try {
-        const res = await fetch("/api/contact-1?forceError=true", {
+        const res = await fetch("/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
