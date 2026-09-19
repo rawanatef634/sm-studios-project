@@ -6,6 +6,7 @@
 export const projects = [
   {
     id: 1,
+    slug: "majlis",
     title: "MAJLIS",
     breadcrumb: "HOME / PROJECTS / MAJLIS",
     heroImage: "/assets/majlis2.png",
@@ -23,6 +24,7 @@ export const projects = [
   },
   {
     id: 2,
+    slug: "maithas-spa",
     title: "MAITHA'S SPA",
     breadcrumb: "HOME / PROJECTS / MAITHA'S SPA",
     heroImage: "/assets/ms.png",
@@ -40,6 +42,7 @@ export const projects = [
   },
   {
     id: 3,
+    slug: "blush-spa",
     title: "BLUSH SPA",
     breadcrumb: "HOME / PROJECTS / BLUSH SPA",
     heroImage: "/assets/bs1.jpg",
@@ -57,6 +60,7 @@ export const projects = [
   },
   {
     id: 4,
+    slug: "off-white",
     title: "OFF WHITE",
     breadcrumb: "HOME / PROJECTS / OFF WHITE",
     heroImage: "/assets/offwhite1.jpg",
@@ -75,6 +79,7 @@ export const projects = [
 
   {
     id: 5,
+    slug: "garden-cafe",
     title: "GARDEN CAFE",
     breadcrumb: "HOME / PROJECTS / GARDEN CAFE",
     heroImage: "/assets/gc1.jpg",
@@ -93,6 +98,7 @@ export const projects = [
 
   {
     id: 6,
+    slug: "dential-hub",
     title: "DENTIAL HUB",
     breadcrumb: "HOME / PROJECTS / DENTIAL HUB",
     heroImage: "/assets/dh1.jpg",
@@ -111,6 +117,7 @@ export const projects = [
 
   {
     id: 7,
+    slug: "kettle-cafe",
     title: "KETTLE CAFE",
     breadcrumb: "HOME / PROJECTS / KETTLE CAFE",
     heroImage: "/assets/kf1.jpg",
@@ -129,6 +136,7 @@ export const projects = [
 
   {
     id: 8,
+    slug: "tahir-villa",
     title: "TAHIR VILLA",
     breadcrumb: "HOME / PROJECTS / TAHIR VILLA",
     heroImage: "/assets/villa.png",
@@ -147,6 +155,7 @@ export const projects = [
 
   {
     id: 9,
+    slug: "leicht",
     title: "LEICHT",
     breadcrumb: "HOME / PROJECTS / LEICHT",
     heroImage: "/assets/leicht1.jpg",
@@ -165,6 +174,7 @@ export const projects = [
 
   {
     id: 10,
+    slug: "goat-barber",
     title: "GOAT BARBER",
     breadcrumb: "HOME / PROJECTS / GOAT BARBER",
     heroImage: "/assets/gbs2.png",

@@ -6,6 +6,7 @@ import { projects as allProjects } from "./projectsDetails";
 
 export const projects = allProjects.map((p) => ({
   id: p.id,
+  slug: p.slug,
   title: p.title,
   img: p.heroImage || p.mainImage,
   caption: p.story,
