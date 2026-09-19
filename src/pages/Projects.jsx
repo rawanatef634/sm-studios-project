@@ -69,7 +69,7 @@ export default function ProjectsPage() {
                 }}
               >
                 <Link
-                  to={`/projects/${proj.slug}`}
+                  to={`/projects/${proj.id}`}
                   className="group block overflow-hidden shadow-lg transition duration-500 hover:shadow-2xl"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden">

@@ -57,7 +57,7 @@ function ProjectCard({ project, variant }) {
           },
         }}
       >
-        <Link to={`/projects/${project.slug}`} className="absolute inset-0 block">
+        <Link to={`/projects/${project.id}`} className="absolute inset-0 block">
           <motion.div
             className="absolute inset-0"
             animate={{
@@ -247,7 +247,7 @@ function DesktopStage({ projects, index }) {
             }}
           >
             <Link
-              to={`/projects/${project.slug}`}
+              to={`/projects/${project.id}`}
               className="block h-full w-full"
             >
               <div className="relative h-full w-full overflow-hidden">
@@ -330,7 +330,7 @@ function MobileStage({ projects, index, direction }) {
           exit={{ opacity: 0, x: exitX }}
           transition={{ duration: 0.4, ease: EASE }}
         >
-          <Link to={`/projects/${center.slug}`} className="block">
+          <Link to={`/projects/${center.id}`} className="block">
             <div className="aspect-[4/3] w-full overflow-hidden">
               <OptimizedImage
                 src={projectImage(center)}
@@ -370,7 +370,7 @@ export default function PortfolioCarousel() {
       if (busyRef.current || n < 2) return;
       busyRef.current = true;
       setDirection(dir);
-      setIndex(next);
+      setIndex(wrapIndex(next, n));
       window.setTimeout(() => {
         busyRef.current = false;
       }, 950);
