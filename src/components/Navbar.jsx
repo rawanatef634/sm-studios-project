@@ -1,12 +1,27 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { captureError } from "@heronsignal/web";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopServicesOpen, setDesktopServicesOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [quoteFailed, setQuoteFailed] = useState(false);
   const dropdownRef = useRef(null);
   const desktopCloseTimer = useRef(null);
+  const quoteFailTimer = useRef(null);
+
+  // HA TEST: navbar control that visibly fails on click
+  const handleBrokenQuoteClick = () => {
+    clearTimeout(quoteFailTimer.current);
+    setQuoteFailed(true);
+    captureError(new Error("Navbar Get Quote button failed"));
+    quoteFailTimer.current = setTimeout(() => setQuoteFailed(false), 2200);
+  };
+
+  useEffect(() => {
+    return () => clearTimeout(quoteFailTimer.current);
+  }, []);
 
   // Close desktop services dropdown when clicking outside
   useEffect(() => {
@@ -151,6 +166,18 @@ const Navbar = () => {
           <Link to="/careers" className="hover:opacity-80 transition">
             Careers
           </Link>
+          <button
+            type="button"
+            onClick={handleBrokenQuoteClick}
+            aria-label="Get quote"
+            className={`border border-white/40 px-4 py-2 tracking-[0.14em] uppercase transition ${
+              quoteFailed
+                ? "animate-pulse border-red-400 bg-red-500/20 text-red-300"
+                : "hover:bg-white hover:text-black"
+            }`}
+          >
+            {quoteFailed ? "Failed" : "Get Quote"}
+          </button>
         </nav>
 
         {/* Mobile hamburger button */}
@@ -282,11 +309,21 @@ const Navbar = () => {
             </Link>
             <Link
               to="/careers"
-              className="py-4 text-[15px] tracking-[0.16em] uppercase"
+              className="border-b border-white/10 py-4 text-[15px] tracking-[0.16em] uppercase"
               onClick={() => setMobileOpen(false)}
             >
               Careers
             </Link>
+            <button
+              type="button"
+              onClick={handleBrokenQuoteClick}
+              aria-label="Get quote"
+              className={`py-4 text-left text-[15px] tracking-[0.16em] uppercase transition ${
+                quoteFailed ? "animate-pulse text-red-300" : "text-white"
+              }`}
+            >
+              {quoteFailed ? "Failed — try again" : "Get Quote"}
+            </button>
           </nav>
         </div>
       )}
