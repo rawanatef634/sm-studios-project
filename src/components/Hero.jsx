@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import SocialLinks from "./SocialLinks";
 import OptimizedImage from "./OptimizedImage";
 
@@ -27,6 +28,7 @@ const slides = [
 
 export default function HeroSection() {
   const [current, setCurrent] = useState(0);
+  const [isOpeningProject, setIsOpeningProject] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,6 +36,16 @@ export default function HeroSection() {
     }, 6000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!isOpeningProject) return undefined;
+
+    const timer = setTimeout(() => {
+      setIsOpeningProject(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [isOpeningProject]);
 
   return (
     <section className="relative w-full h-[100svh] min-h-0 overflow-hidden bg-black text-white md:h-screen md:min-h-[640px]">
@@ -115,12 +127,18 @@ export default function HeroSection() {
         </AnimatePresence>
 
         {/* Project link */}
-        <a
-          href={slides[current].link}
-          className="mt-6 inline-block font-['El_Messiri'] text-white/80 hover:text-white underline underline-offset-8 text-base md:text-lg transition"
+        <Link
+          to={slides[current].link}
+          onClick={() => setIsOpeningProject(true)}
+          aria-disabled={isOpeningProject}
+          className={`mt-6 inline-block font-['El_Messiri'] underline underline-offset-8 text-base md:text-lg transition ${
+            isOpeningProject
+              ? "pointer-events-none text-white/60"
+              : "text-white/80 hover:text-white"
+          }`}
         >
-          View project
-        </a>
+          {isOpeningProject ? "Opening project..." : "View project"}
+        </Link>
       </div>
 
       {/* === SOCIAL ICONS === */}
