@@ -24,6 +24,7 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const projects = await loadProjects();
+      res.setHeader("Cache-Control", "no-store");
       return res.status(200).json(projects);
     } catch (err) {
       return storeErrorResponse(res, err);

@@ -1,9 +1,9 @@
 /**
  * Project data persistence via Vercel Blob.
  *
- * All projects are stored as a single JSON document at a fixed pathname.
- * Reads add a cache-busting timestamp so server-side fetches always see
- * the latest version rather than a CDN-cached copy.
+ * All projects are stored as a single JSON document, written as a new
+ * versioned blob on every save so reads never get a stale CDN copy
+ * (see jsonBlob.js).
  *
  * Concurrency assumption: SM Studios has a single staff member performing
  * writes. A lightweight read-modify-write approach is therefore safe.
@@ -25,9 +25,9 @@
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { list, put } from "@vercel/blob";
 import { projects as seedProjects } from "../../src/data/projectsDetails.js";
-import { blobAuth, hasBlobToken } from "./blobAuth.js";
+import { hasBlobToken } from "./blobAuth.js";
+import { fetchJsonBlob, findLatestJsonBlob, writeJsonBlob } from "./jsonBlob.js";
 
 export const PROJECTS_PATH = "sm-studios/projects.json";
 
@@ -66,13 +66,12 @@ function writeLocalFile(projects) {
 }
 
 /**
- * Locate the projects.json blob entry by exact pathname only.
+ * Locate the latest version of projects.json (see jsonBlob.js).
  * Distinguishes "missing" from "list failed" by throwing on failure.
  * Never falls back to an unrelated blob under the same prefix.
  */
 async function findProjectsBlob() {
-  const { blobs } = await list({ prefix: PROJECTS_PATH, ...blobAuth() });
-  return blobs.find((b) => b.pathname === PROJECTS_PATH) || null;
+  return findLatestJsonBlob(PROJECTS_PATH);
 }
 
 /**
@@ -87,7 +86,7 @@ async function snapshotForGuard() {
   const blob = await findProjectsBlob();
   if (!blob) return [];
 
-  const resp = await fetch(`${blob.url}?t=${Date.now()}`);
+  const resp = await fetchJsonBlob(blob);
   if (!resp.ok) {
     throw new ProjectStoreError(
       `Cannot verify project store before write (Blob fetch ${resp.status}).`,
@@ -168,7 +167,7 @@ export async function loadProjects() {
 
   // Rule B — existing object, including [], is the source of truth.
   try {
-    const resp = await fetch(`${blob.url}?t=${Date.now()}`);
+    const resp = await fetchJsonBlob(blob);
     if (!resp.ok) {
       throw new Error(`Blob fetch failed: ${resp.status}`);
     }
@@ -228,13 +227,7 @@ export async function persistProjects(projects, options = {}) {
   }
 
   try {
-    await put(PROJECTS_PATH, JSON.stringify(projects), {
-      access: "public",
-      contentType: "application/json",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      ...blobAuth(),
-    });
+    await writeJsonBlob(PROJECTS_PATH, projects);
   } catch (err) {
     if (err instanceof ProjectStoreError) throw err;
     console.error("[projectStore] Blob write failed:", err.message);
@@ -280,7 +273,7 @@ export async function inspectProjectsStore() {
       };
     }
 
-    const resp = await fetch(`${blob.url}?t=${Date.now()}`);
+    const resp = await fetchJsonBlob(blob);
     if (!resp.ok) {
       return {
         mode: "blob",

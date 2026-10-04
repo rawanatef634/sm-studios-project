@@ -18,35 +18,44 @@ export function ProjectsProvider({ children }) {
   const [projects, setProjects] = useState(seedProjects);
   const loading = false;
 
-  // Refresh from the server in the background. Keep seed on failure / empty.
+  // Refresh from the server in the background, and again whenever the tab is
+  // shown so dashboard edits made elsewhere appear. Keep seed on failure / empty.
   useEffect(() => {
     let cancelled = false;
 
-    fetch(API)
-      .then(async (r) => {
-        const data = await r.json().catch(() => null);
-        if (!r.ok) {
-          throw new Error(
-            (data && data.error) || `Projects API failed (${r.status})`,
+    const load = () =>
+      fetch(API, { cache: "no-store" })
+        .then(async (r) => {
+          const data = await r.json().catch(() => null);
+          if (!r.ok) {
+            throw new Error(
+              (data && data.error) || `Projects API failed (${r.status})`,
+            );
+          }
+          const list = normalizeProjects(data);
+          if (!list) throw new Error("Projects API returned non-array JSON.");
+          return list;
+        })
+        .then((list) => {
+          if (cancelled || list.length === 0) return;
+          setProjects(list);
+        })
+        .catch((err) => {
+          console.warn(
+            "[ProjectsContext] Keeping bundled seed:",
+            err.message,
           );
-        }
-        const list = normalizeProjects(data);
-        if (!list) throw new Error("Projects API returned non-array JSON.");
-        return list;
-      })
-      .then((list) => {
-        if (cancelled || list.length === 0) return;
-        setProjects(list);
-      })
-      .catch((err) => {
-        console.warn(
-          "[ProjectsContext] Keeping bundled seed:",
-          err.message,
-        );
-      });
+        });
 
+    const onVisible = () => {
+      if (document.visibilityState === "visible") load();
+    };
+
+    load();
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       cancelled = true;
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 

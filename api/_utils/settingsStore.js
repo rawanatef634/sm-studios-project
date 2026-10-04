@@ -17,8 +17,8 @@ import {
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { list, put } from "@vercel/blob";
-import { blobAuth, hasBlobToken } from "./blobAuth.js";
+import { hasBlobToken } from "./blobAuth.js";
+import { fetchJsonBlob, findLatestJsonBlob, writeJsonBlob } from "./jsonBlob.js";
 import {
   CONTENT_FIELDS,
   DEFAULT_SETTINGS,
@@ -56,15 +56,14 @@ async function readJson(pathname) {
 
   let blob;
   try {
-    const { blobs } = await list({ prefix: pathname, ...blobAuth() });
-    blob = blobs.find((b) => b.pathname === pathname) || null;
+    blob = await findLatestJsonBlob(pathname);
   } catch (err) {
     console.error(`[settingsStore] Blob list failed for ${pathname}:`, err.message);
     throw new SettingsStoreError("Failed to access settings store.", 502);
   }
   if (!blob) return null;
 
-  const resp = await fetch(`${blob.url}?t=${Date.now()}`);
+  const resp = await fetchJsonBlob(blob);
   if (!resp.ok) {
     throw new SettingsStoreError(`Failed to read settings (Blob ${resp.status}).`, 502);
   }
@@ -79,14 +78,7 @@ async function writeJson(pathname, data) {
   }
 
   try {
-    await put(pathname, JSON.stringify(data), {
-      access: "public",
-      contentType: "application/json",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      cacheControlMaxAge: 60,
-      ...blobAuth(),
-    });
+    await writeJsonBlob(pathname, data);
   } catch (err) {
     console.error(`[settingsStore] Blob write failed for ${pathname}:`, err.message);
     throw new SettingsStoreError("Failed to save settings.", 502);

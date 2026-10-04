@@ -30,21 +30,31 @@ export function SiteSettingsProvider({ children }) {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
   // Bundled defaults render immediately; stored overrides replace them.
+  // Refetched whenever the tab is shown so dashboard edits appear.
   useEffect(() => {
     let cancelled = false;
-    fetch(API)
-      .then(async (r) => {
-        if (!r.ok) throw new Error(`Settings API failed (${r.status})`);
-        return r.json();
-      })
-      .then((data) => {
-        if (!cancelled) setSettings(normalize(data));
-      })
-      .catch((err) => {
-        console.warn("[SiteSettingsContext] Using defaults:", err.message);
-      });
+    const load = () =>
+      fetch(API, { cache: "no-store" })
+        .then(async (r) => {
+          if (!r.ok) throw new Error(`Settings API failed (${r.status})`);
+          return r.json();
+        })
+        .then((data) => {
+          if (!cancelled) setSettings(normalize(data));
+        })
+        .catch((err) => {
+          console.warn("[SiteSettingsContext] Using defaults:", err.message);
+        });
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") load();
+    };
+
+    load();
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       cancelled = true;
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
