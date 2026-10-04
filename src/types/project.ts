@@ -12,4 +12,5 @@ export type Project = {
   story: string;
   wideImage?: string;
   approach?: string;
+  category?: string;
 };

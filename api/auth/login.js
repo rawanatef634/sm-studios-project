@@ -2,6 +2,7 @@ import "../_utils/heronsignal.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookieAttrs, readJsonBody } from "../_utils/auth.js";
+import { getAdminPasswordHash } from "../_utils/settingsStore.js";
 
 // ---------------------------------------------------------------------------
 // In-memory rate limiter (per serverless instance).
@@ -63,8 +64,17 @@ export default async function handler(req, res) {
   const { username = "", password = "" } = body;
 
   const adminUsername = process.env.ADMIN_USERNAME;
-  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
   const sessionSecret = process.env.SESSION_SECRET;
+
+  let adminPasswordHash;
+  try {
+    adminPasswordHash = await getAdminPasswordHash();
+  } catch (err) {
+    console.error("[auth/login] Could not load admin credentials:", err.message);
+    return res
+      .status(503)
+      .json({ error: "Login is temporarily unavailable. Please try again." });
+  }
 
   if (!adminUsername || !adminPasswordHash || !sessionSecret) {
     console.error("[auth/login] Missing required environment variables");

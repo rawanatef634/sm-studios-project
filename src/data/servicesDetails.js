@@ -58,35 +58,6 @@ export const servicesDetails = {
     ],
   },
 
-  "3d-visualization": {
-    title: "3D Visualization",
-    breadcrumb: "HOME / SERVICES / 3D VISUALIZATION",
-    backgroundImage: "/assets/3d-vis.png",
-    about:
-      "3D visualization brings ideas to life with photorealistic renders and immersive walkthroughs, helping clients envision their projects before execution.",
-    image: "/assets/3d-vis.png",
-    subServices: [
-      {
-        key: "renders",
-        title: "3D Renders",
-        content:
-          "High-quality renders to showcase materials, lighting, and design.",
-      },
-      {
-        key: "animation",
-        title: "3D Animation",
-        content:
-          "Walkthroughs and flythroughs for a more immersive experience.",
-      },
-      {
-        key: "vr",
-        title: "Virtual Reality",
-        content:
-          "Interactive VR experiences to fully explore spaces before they’re built.",
-      },
-    ],
-  },
-
   "interior-fit-outs": {
     title: "Interior Fit-Outs",
     breadcrumb: "HOME / SERVICES / INTERIOR FIT-OUTS",

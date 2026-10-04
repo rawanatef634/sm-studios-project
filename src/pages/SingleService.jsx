@@ -5,15 +5,18 @@ import Footer from "../components/Footer";
 import HeroSection from "../components/HeroSection";
 import Accordion from "../components/Accordion";
 import ProcessGrid from "../components/ProcessGrid";
-import { projects } from "../data/projects";
 import { Link } from "react-router-dom";
 import { fadeInUp } from "../utils/motionVariants";
+import { useProjects } from "../context/ProjectsContext";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 // Centralized data
 import { servicesDetails, processSteps } from "../data/servicesDetails";
 
 export default function SingleService() {
   const { slug } = useParams();
+  const { projects } = useProjects();
+  const { t } = useSiteSettings();
   const service = servicesDetails[slug];
 
   if (!service) {
@@ -28,7 +31,7 @@ export default function SingleService() {
     <>
       {/* Hero */}
       <HeroSection
-        title={service.title}
+        title={t(`service.${slug}.title`) || service.title}
         breadcrumb={service.breadcrumb}
         backgroundImage={service.backgroundImage}
       />
@@ -46,7 +49,9 @@ export default function SingleService() {
               About This Service
               <div className="mt-5 w-70 border-b border-gray-700"></div>
             </h2>
-            <p className="leading-relaxed md:text-[24px]">{service.about}</p>
+            <p className="whitespace-pre-line leading-relaxed md:text-[24px]">
+              {t(`service.${slug}.about`) || service.about}
+            </p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -123,7 +128,7 @@ export default function SingleService() {
               >
                 <Link to={`/projects/${proj.id}`}>
                   <img
-                    src={proj.img}
+                    src={proj.img || proj.heroImage || proj.mainImage}
                     alt={proj.title}
                     className="w-full h-[350px] object-cover transition-transform duration-700 group-hover:scale-110"
                   />

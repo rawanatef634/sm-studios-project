@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 /** @typedef {import("../types/project").Project} Project */
 
@@ -154,7 +155,11 @@ export default function ProjectForm({
   submitLabel = "Save",
   disabled = false,
 }) {
+  const { settings } = useSiteSettings();
   const [title, setTitle] = useState(initialProject?.title ?? "");
+  const [category, setCategory] = useState(
+    initialProject?.category ?? settings.categories[0] ?? "",
+  );
   const [breadcrumb, setBreadcrumb] = useState(initialProject?.breadcrumb ?? "");
   const [heroImage, setHeroImage] = useState(initialProject?.heroImage ?? "");
   const [img, setImg] = useState(initialProject?.img ?? "");
@@ -181,6 +186,7 @@ export default function ProjectForm({
 
   useEffect(() => {
     setTitle(initialProject?.title ?? "");
+    setCategory(initialProject?.category ?? settings.categories[0] ?? "");
     setBreadcrumb(initialProject?.breadcrumb ?? "");
     setHeroImage(initialProject?.heroImage ?? "");
     setImg(initialProject?.img ?? "");
@@ -194,7 +200,14 @@ export default function ProjectForm({
     setWideImage(initialProject?.wideImage ?? "");
     setApproach(initialProject?.approach ?? "");
     setUploadCount(0);
+    // Only reset when switching projects, not when categories reload.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialProject]);
+
+  const categoryOptions =
+    category && !settings.categories.includes(category)
+      ? [...settings.categories, category]
+      : settings.categories;
 
   const isValid =
     title.trim() &&
@@ -210,8 +223,10 @@ export default function ProjectForm({
 
     /** @type {Project} */
     const project = {
+      ...initialProject,
       id: initialProject?.id ?? Date.now(),
       title,
+      category: category || undefined,
       breadcrumb,
       heroImage: heroImage || undefined,
       img: img || undefined,
@@ -257,6 +272,24 @@ export default function ProjectForm({
             onChange={(e) => setBreadcrumb(e.target.value)}
             className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder:text-slate-500"
           />
+        </label>
+        <label className="grid gap-1.5">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+            Category
+          </span>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100"
+          >
+            {categoryOptions.map((name) => (
+              <option key={name} value={name}>
+                {settings.categories.includes(name)
+                  ? name
+                  : `${name} (not in category list)`}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="grid gap-1.5">
           <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">

@@ -3,7 +3,10 @@
  * - Local /assets paths: prefer generated -480/-800/-1200/-1600 webp+jpg when present
  * - Remote /uploads / Blob URLs: use as-is (uploads are already WebP-optimized)
  * - Display size is controlled by caller className/CSS — no invented aspect ratios
+ * - Pass `widths` only when every listed variant exists for the asset
  */
+const DEFAULT_WIDTHS = [480, 800, 1200, 1600];
+
 export default function OptimizedImage({
   src,
   alt = "",
@@ -12,6 +15,7 @@ export default function OptimizedImage({
   style,
   fill = false,
   priority = false,
+  widths = DEFAULT_WIDTHS,
   ...rest
 }) {
   if (!src) return null;
@@ -49,7 +53,6 @@ export default function OptimizedImage({
   const base = extIndex !== -1 ? normalized.slice(0, extIndex) : normalized;
   const original = `/${encodeAssetPath(normalized)}`;
 
-  const widths = [480, 800, 1200, 1600];
   const makeSrcSet = (ext) =>
     widths
       .map((w) => `/${encodeAssetPath(`${base}-${w}.${ext}`)} ${w}w`)

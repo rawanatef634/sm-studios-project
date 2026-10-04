@@ -6,18 +6,14 @@ import HeroSection from "../components/HeroSection";
 import OptimizedImage from "../components/OptimizedImage";
 import { useState } from "react";
 import { useProjects } from "../context/ProjectsContext";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 export default function ProjectsPage() {
   const { projects } = useProjects();
+  const { settings } = useSiteSettings();
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const categories = [
-    "All",
-    "Interior Design",
-    "Architecture Design",
-    "3D Visualization",
-    "Interior Fit-Outs",
-  ];
+  const categories = ["All", ...settings.categories];
 
   const filteredProjects =
     selectedCategory === "All"

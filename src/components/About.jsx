@@ -1,8 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 export default function About() {
+  const { t } = useSiteSettings();
+
   return (
     <section
       id="about"
@@ -69,7 +72,7 @@ export default function About() {
           }}
           viewport={{ once: true }}
         >
-          About SM Studios
+          {t("home.about.label")}
         </motion.p>
 
         {/* TEXT */}
@@ -106,6 +109,7 @@ export default function About() {
         >
           <motion.h2
             className="
+              whitespace-pre-line
               text-left
               font-['El_Messiri']
               text-[28px]
@@ -124,13 +128,12 @@ export default function About() {
             }}
             viewport={{ once: true }}
           >
-            WE CREATE INTERIORS WITH
-            <br />
-            PRECISION.
+            {t("home.about.title")}
           </motion.h2>
 
           <motion.p
             className="
+              whitespace-pre-line
               text-left
               font-['El_Messiri']
               text-[16px]
@@ -149,11 +152,7 @@ export default function About() {
             }}
             viewport={{ once: true }}
           >
-            As a premier Omani establishment headquartered in Muscat, our firm
-            specializes in the dynamic realm of interior architecture design.
-            Our unwavering commitment is centered around propelling this
-            industry towards unparalleled development through the strategic
-            integration of cutting-edge technology.
+            {t("home.about.body")}
           </motion.p>
 
           <a href="#team">
@@ -183,7 +182,7 @@ export default function About() {
               }}
               viewport={{ once: true }}
             >
-              Meet Our Team
+              {t("home.about.button")}
             </motion.button>
           </a>
         </motion.div>

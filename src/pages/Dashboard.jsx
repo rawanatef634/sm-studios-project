@@ -2,15 +2,28 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FolderKanban, LogOut, Pencil, Plus, Trash2, Eye } from "lucide-react";
 import ProjectForm from "../components/ProjectForm";
+import HeroSettings from "../components/admin/HeroSettings";
+import CategorySettings from "../components/admin/CategorySettings";
+import ContentSettings from "../components/admin/ContentSettings";
+import AccountSettings from "../components/admin/AccountSettings";
 import { useProjects } from "../context/ProjectsContext";
 import { useAuth } from "../context/AuthContext";
 
 /** @typedef {import("../types/project").Project} Project */
 
+const TABS = [
+  { id: "projects", label: "Projects" },
+  { id: "hero", label: "Hero Banner" },
+  { id: "categories", label: "Categories" },
+  { id: "content", label: "Website Text" },
+  { id: "account", label: "Password" },
+];
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { projects, addProject, updateProject, deleteProject } = useProjects();
+  const [tab, setTab] = useState("projects");
   const [isAdding, setIsAdding] = useState(false);
   const [editingProject, setEditingProject] = useState(/** @type {Project | null} */ (null));
   const [projectToDelete, setProjectToDelete] = useState(
@@ -80,17 +93,18 @@ export default function Dashboard() {
                 ADMIN PANEL
               </p>
               <h1 className="text-3xl font-semibold text-white md:text-4xl">
-                Project Dashboard
+                Website Dashboard
               </h1>
               <p className="mt-2 text-sm text-slate-300">
-                Manage project entries that render directly through the locked
-                template.
+                Manage projects, the home page banner, categories, website text
+                and your password.
               </p>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={() => {
+                  setTab("projects");
                   setMutationError("");
                   setEditingProject(null);
                   setIsAdding(true);
@@ -112,6 +126,35 @@ export default function Dashboard() {
           </div>
         </div>
 
+        <nav className="mb-6 flex flex-wrap gap-2" aria-label="Dashboard sections">
+          {TABS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setTab(id)}
+              aria-current={tab === id ? "page" : undefined}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                tab === id
+                  ? "bg-white text-slate-950"
+                  : "border border-white/15 text-slate-300 hover:bg-white/10"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+
+        {tab !== "projects" && (
+          <div className="rounded-2xl border border-white/10 bg-slate-900 p-4 md:p-6">
+            {tab === "hero" && <HeroSettings />}
+            {tab === "categories" && <CategorySettings />}
+            {tab === "content" && <ContentSettings />}
+            {tab === "account" && <AccountSettings />}
+          </div>
+        )}
+
+        {tab === "projects" && (
+        <>
         <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-slate-900 p-4">
             <p className="text-xs uppercase tracking-wider text-slate-400">
@@ -188,7 +231,9 @@ export default function Dashboard() {
                 >
                   <div>
                     <p className="text-lg font-semibold text-white">{project.title}</p>
-                    <p className="text-sm text-slate-400">ID: {project.id}</p>
+                    <p className="text-sm text-slate-400">
+                      {project.category || "No category"} · ID: {project.id}
+                    </p>
                   </div>
 
                   <div className="flex gap-2">
@@ -224,6 +269,8 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+        </>
+        )}
       </div>
 
       {projectToDelete && (

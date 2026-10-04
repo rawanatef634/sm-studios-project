@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 export default function ContactSection() {
+  const { t } = useSiteSettings();
+
   return (
     <section
       className="relative mx-auto min-h-[520px] bg-cover bg-center md:min-h-[560px]"
@@ -16,14 +19,11 @@ export default function ContactSection() {
 
       <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-between gap-10 px-6 py-24 text-center md:flex-row md:items-center md:gap-12 md:px-10 md:py-28 md:text-left">
         <div className="text-white md:max-w-2xl">
-          <h2 className="mb-5 font-['El_Messiri'] text-4xl font-semibold uppercase leading-[1.05] md:text-[56px] md:leading-[1.05] lg:text-[64px]">
-            LET’S CREATE YOUR
-            <br />
-            NEXT SPACE
+          <h2 className="mb-5 whitespace-pre-line font-['El_Messiri'] text-4xl font-semibold uppercase leading-[1.05] md:text-[56px] md:leading-[1.05] lg:text-[64px]">
+            {t("cta.title")}
           </h2>
-          <p className="max-w-xl text-base leading-relaxed text-white/90 md:text-xl md:leading-relaxed">
-            Our team is ready to turn your vision into a reality with designs
-            that inspire and last.
+          <p className="max-w-xl whitespace-pre-line text-base leading-relaxed text-white/90 md:text-xl md:leading-relaxed">
+            {t("cta.body")}
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export default function ContactSection() {
                 vectorEffect="non-scaling-stroke"
               />
             </svg>
-            GET IN TOUCH
+            {t("cta.button")}
             <ArrowUpRight size={20} strokeWidth={1.25} className="shrink-0" />
           </Link>
         </div>

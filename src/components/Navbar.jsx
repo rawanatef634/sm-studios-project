@@ -127,13 +127,6 @@ const Navbar = () => {
                     Architecture Design
                   </Link>
                   <Link
-                    to="/services/3d-visualization"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                    onClick={() => setDesktopServicesOpen(false)}
-                  >
-                    3D Visualization
-                  </Link>
-                  <Link
                     to="/services/interior-fit-outs"
                     className="block px-4 py-2 hover:bg-gray-100"
                     onClick={() => setDesktopServicesOpen(false)}
@@ -254,13 +247,6 @@ const Navbar = () => {
                     onClick={() => setMobileOpen(false)}
                   >
                     Architecture Design
-                  </Link>
-                  <Link
-                    to="/services/3d-visualization"
-                    className="py-2.5 text-[14px] tracking-[0.04em] text-white/80"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    3D Visualization
                   </Link>
                   <Link
                     to="/services/interior-fit-outs"

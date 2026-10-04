@@ -53,7 +53,7 @@ export const projects = [
     wideImage: "/assets/bs2.jpg",
     approach:
       "We designed a calm retreat with privacy, comfort, and a sophisticated material palette to elevate the guest experience.",
-    category: "3D Visualization",
+    category: "Interior Design",
   },
   {
     id: 4,
@@ -160,7 +160,7 @@ export const projects = [
     wideImage: "/assets/leicht6.jpg",
     approach:
       "Architectural lines, natural finishes, and vertical greenery create an inspiring display space.",
-    category: "3D Visualization",
+    category: "Interior Fit-Outs",
   },
 
   {

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import SocialLinks from "./SocialLinks";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 // make rule even more lighter grey
 /** Sampled from Figma footer reference */
 const BG = "#191F22";
@@ -55,6 +56,8 @@ function SectionLabel({ children }) {
 }
 
 export default function Footer() {
+  const { t } = useSiteSettings();
+
   return (
     <footer className="text-white" style={{ backgroundColor: BG }}>
       <div className="max-w-[1512px] mx-auto px-14 py-14 md: md:py-16">
@@ -121,10 +124,10 @@ export default function Footer() {
             <div className="sm:h-15 h-0"></div>
             <SectionLabel>Location:</SectionLabel>
             <p
-              className="max-w-[300px] font-['El_Messiri'] text-[15px] leading-relaxed md:text-[16px]"
+              className="max-w-[300px] whitespace-pre-line font-['El_Messiri'] text-[15px] leading-relaxed md:text-[16px]"
               style={{ color: BODY }}
             >
-              207 Office, 2nd Second floor, Bowsher, Muscat, Sultanate of Oman
+              {t("footer.location")}
             </p>
           </div>
 
@@ -135,9 +138,9 @@ export default function Footer() {
               className="space-y-1 font-['El_Messiri'] text-[15px] md:text-[16px]"
               style={{ color: BODY }}
             >
-              <p>info@smstudios-om.com</p>
-              <p>+968 2412 8488</p>
-              <p>+968 78444636</p>
+              <p>{t("footer.email")}</p>
+              <p>{t("footer.phone1")}</p>
+              <p>{t("footer.phone2")}</p>
             </div>
             <div className="sm:h-15 h-0"></div>
             <SocialLinks
@@ -150,7 +153,7 @@ export default function Footer() {
               className="mt-10 text-[15px] uppercase tracking-[0.16em] md:mt-auto md:pt-10 md:text-right"
               style={{ color: BODY }}
             >
-              © 2025 SM STUDIOS. ALL RIGHTS RESERVED.
+              {t("footer.copyright")}
             </p>
           </div>
         </div>

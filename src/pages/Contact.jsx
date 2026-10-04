@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { captureError, event } from "@heronsignal/web";
 import HeroSection from "../components/HeroSection";
 import Footer from "../components/Footer";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -10,6 +11,7 @@ const fadeUp = {
 };
 
 const Contact = () => {
+  const { t } = useSiteSettings();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -117,9 +119,8 @@ const Contact = () => {
           viewport={{ once: true }}
           variants={fadeUp}
         >
-          <p className="w-full px-6 md:px-8 md:text-[32px] font-['El_Messiri'] font-light">
-            Let's discuss your next project. Our team is ready to bring your
-            ideas to life.
+          <p className="w-full whitespace-pre-line px-6 md:px-8 md:text-[32px] font-['El_Messiri'] font-light">
+            {t("contact.intro")}
           </p>
         </motion.section>
 

@@ -99,8 +99,20 @@ export function ProjectsProvider({ children }) {
     setProjects((prev) => prev.filter((p) => p.id !== id));
   };
 
+  /** Replace the local list after a server-side bulk change (e.g. category rename). */
+  const replaceProjects = (list) => {
+    if (Array.isArray(list)) setProjects(list);
+  };
+
   const value = useMemo(
-    () => ({ projects, loading, addProject, updateProject, deleteProject }),
+    () => ({
+      projects,
+      loading,
+      addProject,
+      updateProject,
+      deleteProject,
+      replaceProjects,
+    }),
     [projects, loading],
   );
 

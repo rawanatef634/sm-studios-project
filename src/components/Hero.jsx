@@ -1,39 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import SocialLinks from "./SocialLinks";
 import OptimizedImage from "./OptimizedImage";
+import { useProjects } from "../context/ProjectsContext";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
-const slides = [
-  {
-    id: 1,
-    title: "MAJLIS",
-    image: "/assets/majlis3.png",
-    mobileImage: "/assets/majlis2.png",
-    link: "/projects/1",
-  },
-  {
-    id: 2,
-    title: "MAITHA'S SPA",
-    image: "/assets/ms4.png",
-    link: "/projects/2",
-  },
-  {
-    id: 3,
-    title: "BLUSH SPA",
-    image: "/assets/bs1.jpg",
-    link: "/projects/3",
-  },
-];
+const HERO_WIDTHS = [800, 1200, 1600, 2400];
 
 export default function HeroSection() {
-  const [current, setCurrent] = useState(0);
+  const { projects } = useProjects();
+  const { settings } = useSiteSettings();
+  const [selected, setSelected] = useState(0);
+
+  const slides = useMemo(() => {
+    const chosen = settings.heroProjectIds
+      .map((id) => projects.find((p) => String(p.id) === String(id)))
+      .filter(Boolean);
+    return (chosen.length > 0 ? chosen : projects.slice(0, 3))
+      .map((p) => ({
+        id: p.id,
+        title: p.title,
+        image: p.heroImage || p.mainImage || p.img,
+        link: `/projects/${p.id}`,
+      }))
+      .filter((s) => s.image);
+  }, [projects, settings.heroProjectIds]);
+
+  const current = slides.length > 0 ? selected % slides.length : 0;
 
   useEffect(() => {
+    if (slides.length < 2) return undefined;
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length);
+      setSelected((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, []);
+  }, [slides.length]);
+
+  if (slides.length === 0) {
+    return <section className="h-[100svh] w-full bg-black md:h-screen" />;
+  }
 
   return (
     <section className="relative w-full h-[100svh] min-h-0 overflow-hidden bg-black text-white md:h-screen md:min-h-[640px]">
@@ -47,26 +53,15 @@ export default function HeroSection() {
           exit={{ opacity: 0 }}
           transition={{ duration: 1.2 }}
         >
-          <div className="absolute inset-0 md:hidden">
-            <OptimizedImage
-              src={slides[current].mobileImage || slides[current].image}
-              alt=""
-              className="h-full w-full object-cover object-center"
-              sizes="100vw"
-              fill
-              priority={current === 0}
-            />
-          </div>
-          <div className="absolute inset-0 hidden md:block">
-            <OptimizedImage
-              src={slides[current].image}
-              alt=""
-              className="h-full w-full object-cover object-center"
-              sizes="100vw"
-              fill
-              priority={current === 0}
-            />
-          </div>
+          <OptimizedImage
+            src={slides[current].image}
+            alt=""
+            className="h-full w-full object-cover object-center"
+            sizes="100vw"
+            widths={HERO_WIDTHS}
+            fill
+            priority={current === 0}
+          />
         </motion.div>
       </AnimatePresence>
 
@@ -90,7 +85,7 @@ export default function HeroSection() {
           transition={{ duration: 0.4 }}
           className="font-['El_Messiri'] text-2xl md:text-[40px] uppercase mb-2"
         >
-          <span>{String(slides[current].id).padStart(2, "0")}</span>
+          <span>{String(current + 1).padStart(2, "0")}</span>
           <span className="text-[0.62em] opacity-90">
             /{String(slides.length).padStart(2, "0")}
           </span>
@@ -115,12 +110,12 @@ export default function HeroSection() {
         </AnimatePresence>
 
         {/* Project link */}
-        <a
-          href={slides[current].link}
+        <Link
+          to={slides[current].link}
           className="mt-6 inline-block font-['El_Messiri'] text-white/80 hover:text-white underline underline-offset-8 text-base md:text-lg transition"
         >
           View project
-        </a>
+        </Link>
       </div>
 
       {/* === SOCIAL ICONS === */}
@@ -147,7 +142,7 @@ export default function HeroSection() {
           <motion.div
             key={s.id}
             whileHover={{ scale: 1.05 }}
-            onClick={() => setCurrent(idx)}
+            onClick={() => setSelected(idx)}
             className={`cursor-pointer transition-all duration-300 ${
               idx === current ? "text-white" : "text-white/60"
             }`}
@@ -159,7 +154,7 @@ export default function HeroSection() {
                   : "max-md:border-b-2 max-md:border-transparent"
               }`}
             >
-              {String(s.id).padStart(2, "0")}
+              {String(idx + 1).padStart(2, "0")}
             </div>
             <div className="hidden md:block text-xs md:text-sm tracking-wide">
               {s.title}

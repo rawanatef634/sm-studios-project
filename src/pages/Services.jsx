@@ -6,19 +6,16 @@ import ContactSection from "../components/Contact";
 import Footer from "../components/Footer";
 import HeroSection from "../components/HeroSection";
 import { services } from "../data/services";
-import { projects } from "../data/projectsDetails";
+import { useProjects } from "../context/ProjectsContext";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 import { fadeInUp, fadeInLeft, fadeInRight } from "../utils/motionVariants";
 
 export default function ServicesPage() {
+  const { projects } = useProjects();
+  const { settings, t } = useSiteSettings();
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const categories = [
-    "All",
-    "Interior Design",
-    "Architecture Design",
-    "3D Visualization",
-    "Interior Fit-Outs",
-  ];
+  const categories = ["All", ...settings.categories];
 
   const filteredProjects =
     selectedCategory === "All"
@@ -62,7 +59,7 @@ export default function ServicesPage() {
                 <Link to={`/services/${service.slug}`}>
                   <img
                     src={service.img}
-                    alt={service.title}
+                    alt={t(`service.${service.slug}.title`)}
                     className="w-full h-[422px] object-cover shadow-md hover:scale-[1.03] transition-transform duration-500"
                     loading="lazy"
                   />
@@ -88,10 +85,10 @@ export default function ServicesPage() {
                   {service.id}
                 </span>
                 <h2 className="relative z-10 mb-5 font-['El_Messiri'] text-[28px] font-semibold uppercase leading-tight md:text-[40px]">
-                  {service.title}
+                  {t(`service.${service.slug}.title`)}
                 </h2>
-                <p className="relative z-10 mb-8 text-[16px] leading-relaxed text-gray-400 md:text-[18px]">
-                  {service.text}
+                <p className="relative z-10 mb-8 whitespace-pre-line text-[16px] leading-relaxed text-gray-400 md:text-[18px]">
+                  {t(`service.${service.slug}.text`)}
                 </p>
                 <Link
                   to={`/services/${service.slug}`}

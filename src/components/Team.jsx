@@ -1,22 +1,24 @@
 "use client";
 import { motion } from "framer-motion";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 export default function Team() {
+  const { t } = useSiteSettings();
   /** Order: founders first, then Talal, then team (per brief). Replace image paths when new assets are added. */
   const teamMembers = [
     {
       name: "Muhannad Al-Hinai",
       role: "Managing Partner | CEO",
-      image: "/assets/Muhannad Al-Hinai.png",
-      objectPosition: "center 18%",
-      scale: 1.1,
+      image: "/assets/Muhannad Al-Hinai.jpg",
+      objectPosition: "center",
+      scale: 1,
     },
     {
       name: "Mohammed Al-Habsi",
       role: "Co-Founder | CFO",
-      image: "/assets/Mohammed Al-Habsi.png",
-      objectPosition: "center 18%",
-      scale: 1.1,
+      image: "/assets/Mohammed Al-Habsi.jpg",
+      objectPosition: "center",
+      scale: 1,
     },
     {
       name: "Talal Alhabsi",
@@ -26,25 +28,11 @@ export default function Team() {
       scale: 1.85,
     },
     {
-      name: "Hamida",
-      role: "Senior Interior Engineer",
-      image: "/assets/Reemi Mahoudh.jpeg",
-      objectPosition: "center 14%",
-      scale: 1.95,
-    },
-    {
       name: "Basith",
       role: "Senior Interior Engineer",
       image: "/assets/Abdulbasith.jpeg",
       objectPosition: "center 12%",
       scale: 2.05,
-    },
-    {
-      name: "Rayan",
-      role: "Graphic Designer",
-      image: "/assets/Raiyan Eltoqi.jpeg",
-      objectPosition: "center 14%",
-      scale: 1.95,
     },
   ];
 
@@ -59,23 +47,22 @@ export default function Team() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          MEET THE OWNERS
+          {t("home.team.label")}
         </motion.p>
 
         <motion.h2
-          className="font-['El_Messiri'] text-3xl md:text-5xl font-semibold text-gray-900 mb-12 max-w-6xl"
+          className="whitespace-pre-line font-['El_Messiri'] text-3xl md:text-5xl font-semibold text-gray-900 mb-12 max-w-6xl"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
           viewport={{ once: true }}
         >
-          The vision of SM Studios comes from the passion and creativity of its
-          founders.
+          {t("home.team.title")}
         </motion.h2>
 
         {/* Team grid */}
         <motion.div
-          className="grid grid-cols-2 gap-x-4 gap-y-8 md:flex md:flex-wrap md:justify-center md:gap-20"
+          className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-10"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -91,7 +78,7 @@ export default function Team() {
           {teamMembers.map((member) => (
             <motion.div
               key={member.name}
-              className="group text-left w-full md:w-70"
+              className="group text-left w-full"
               variants={{
                 hidden: { opacity: 0, y: 60 },
                 visible: { opacity: 1, y: 0 },
