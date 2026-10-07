@@ -18,6 +18,7 @@
     "@heronsignal/web": "^0.1.0",
     "@tailwindcss/vite": "^4.1.12",
     "@vercel/blob": "^2.8.0",
+    "@vercel/functions": "^3.9.11",
     "bcryptjs": "^3.0.3",
     "busboy": "^1.6.0",
     "framer-motion": "^12.23.12",

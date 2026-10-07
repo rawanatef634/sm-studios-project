@@ -1,7 +1,9 @@
 import "./_utils/heronsignal.js";
+import { waitUntil } from "@vercel/functions";
 import {
   CONTACT_TO,
   MailConfigError,
+  getResend,
   rowsToHtml,
   rowsToText,
   sendStudioEmail,
@@ -133,21 +135,29 @@ export default async function handler(req, res) {
   ];
 
   try {
-    await sendStudioEmail({
+    getResend();
+  } catch (err) {
+    if (err instanceof MailConfigError) {
+      return res.status(err.status).json({ error: err.message });
+    }
+    throw err;
+  }
+
+  // Failures after this point only reach the server logs, not the visitor.
+  waitUntil(
+    sendStudioEmail({
       subject: `${title} — ${name}`,
       html: rowsToHtml(title, rows),
       text: rowsToText(title, rows),
       replyTo: email,
       attachments: attachment ? [attachment] : undefined,
-    });
-    return res.status(200).json({ ok: true });
-  } catch (err) {
-    if (err instanceof MailConfigError) {
-      return res.status(err.status).json({ error: err.message });
-    }
-    console.error("[contact] send failed:", err.message || err);
-    return res.status(err.status || 502).json({
-      error: `Could not send your message to ${CONTACT_TO}. Please try again or email that address directly.`,
-    });
-  }
+    }).catch((err) => {
+      console.error(
+        `[contact] send to ${CONTACT_TO} failed for ${email}:`,
+        err.message || err,
+      );
+    }),
+  );
+
+  return res.status(200).json({ ok: true });
 }
