@@ -12,6 +12,11 @@ import {
   isValidEmail,
   trimStr,
 } from "./_utils/formLimits.js";
+import { decodeBase64Payload } from "./_utils/resumeFile.js";
+import {
+  detectAttachmentKind,
+  safeAttachmentFilename,
+} from "./_utils/contactAttachment.js";
 
 const attempts = new Map();
 const MAX_ATTEMPTS = 8;
@@ -50,6 +55,7 @@ function validateContact(body) {
   if (!name) errors.name = "Full Name is required";
   if (!email) errors.email = "Email is required";
   else if (!isValidEmail(email)) errors.email = "Invalid email address";
+  if (!phone) errors.phone = "Phone number is required";
   if (!project) errors.project = "Project type is required";
 
   if (Object.keys(errors).length) {
@@ -92,6 +98,28 @@ export default async function handler(req, res) {
   const { name, email, phone, project, location, area, requirements } =
     parsed.fields;
 
+  let attachment = null;
+  const attachmentMeta =
+    body?.attachment && typeof body.attachment === "object"
+      ? body.attachment
+      : null;
+  if (attachmentMeta?.data && typeof attachmentMeta.data === "string") {
+    const buffer = decodeBase64Payload(attachmentMeta.data);
+    const kind = detectAttachmentKind(buffer, attachmentMeta.filename);
+    if (!kind.ok) {
+      const status = /too large/i.test(kind.error) ? 413 : 415;
+      return res.status(status).json({
+        error: kind.error,
+        errors: { attachment: kind.error },
+      });
+    }
+    attachment = {
+      filename: safeAttachmentFilename(attachmentMeta.filename, kind.ext),
+      content: buffer.toString("base64"),
+      contentType: kind.contentType,
+    };
+  }
+
   const title = "NEW WEBSITE CONTACT";
   const rows = [
     ["Name", name],
@@ -100,7 +128,8 @@ export default async function handler(req, res) {
     ["Project type", project],
     ["Location", location],
     ["Area (SQM)", area],
-    ["Special requirements", requirements],
+    ["Any notice", requirements],
+    ["Attachment", attachment?.filename],
   ];
 
   try {
@@ -109,6 +138,7 @@ export default async function handler(req, res) {
       html: rowsToHtml(title, rows),
       text: rowsToText(title, rows),
       replyTo: email,
+      attachments: attachment ? [attachment] : undefined,
     });
     return res.status(200).json({ ok: true });
   } catch (err) {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { captureError, event } from "@heronsignal/web";
+import { Paperclip } from "lucide-react";
 import HeroSection from "../components/HeroSection";
 import Footer from "../components/Footer";
 import { useSiteSettings } from "../context/SiteSettingsContext";
@@ -9,6 +10,21 @@ const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
 };
+
+const MAX_ATTACHMENT_BYTES = 3 * 1024 * 1024;
+const ATTACHMENT_EXT = /\.(pdf|doc|docx|jpe?g|png)$/i;
+
+const OFFICE_MAP_QUERY = "AQAR - Al Khonji Real Estate & Development SAOC";
+const OFFICE_MAP_LINK = "https://maps.app.goo.gl/DEzSRcX1FBEotF7g8";
+
+const readAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () =>
+      reject(reader.error || new Error("Could not read attachment"));
+    reader.readAsDataURL(file);
+  });
 
 const Contact = () => {
   const { t } = useSiteSettings();
@@ -22,6 +38,7 @@ const Contact = () => {
     requirements: "",
   });
 
+  const [attachment, setAttachment] = useState(null);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,6 +51,7 @@ const Contact = () => {
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
       newErrors.email = "Invalid email address";
     }
+    if (!form.phone.trim()) newErrors.phone = "Phone number is required";
     if (!form.project) newErrors.project = "Project type is required";
     return newErrors;
   };
@@ -44,6 +62,34 @@ const Contact = () => {
     if (errors[e.target.name]) {
       setErrors({ ...errors, [e.target.name]: "" });
     }
+  };
+
+  const handleAttachmentChange = (e) => {
+    const selected = e.target.files[0];
+    if (!selected) {
+      setAttachment(null);
+      return;
+    }
+    if (
+      ATTACHMENT_EXT.test(selected.name) &&
+      selected.size <= MAX_ATTACHMENT_BYTES
+    ) {
+      setAttachment(selected);
+      setErrors({ ...errors, attachment: "" });
+    } else {
+      setAttachment(null);
+      e.target.value = "";
+      setErrors({
+        ...errors,
+        attachment: "Only .pdf, .doc, .docx, .jpg, .png under 3MB allowed.",
+      });
+    }
+  };
+
+  const clearAttachment = () => {
+    setAttachment(null);
+    const input = document.getElementById("contact-attachment");
+    if (input) input.value = "";
   };
 
   const handleSubmit = async (e) => {
@@ -59,10 +105,18 @@ const Contact = () => {
       setStatus("");
 
       try {
+        const payload = { ...form };
+        if (attachment) {
+          payload.attachment = {
+            filename: attachment.name,
+            data: await readAsDataUrl(attachment),
+          };
+        }
+
         const res = await fetch("/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify(payload),
         });
 
         const data = await res.json().catch(() => ({}));
@@ -91,6 +145,7 @@ const Contact = () => {
           area: "",
           requirements: "",
         });
+        clearAttachment();
       } catch (error) {
         console.error("Contact form submission failed:", error);
         captureError(error);
@@ -129,18 +184,31 @@ const Contact = () => {
           <div className="w-full px-6 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Map */}
             <motion.div
-              className="w-full h-[500px] overflow-hidden shadow-lg"
+              className="w-full"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
             >
-              <iframe
-                title="map"
-                src="https://www.google.com/maps?q=Muscat,Oman&hl=es;z=14&output=embed"
-                className="w-full h-full border-0"
-                loading="lazy"
-              ></iframe>
+              <div className="w-full h-[500px] overflow-hidden shadow-lg">
+                <iframe
+                  title="SM Studios office location"
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(OFFICE_MAP_QUERY)}&z=17&output=embed`}
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                ></iframe>
+              </div>
+              <div className="mt-4 text-gray-300">
+                <p>Second Floor, Office 207</p>
+                <a
+                  href={OFFICE_MAP_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm underline hover:text-white transition-colors"
+                >
+                  Open in Google Maps
+                </a>
+              </div>
             </motion.div>
 
             {/* Form */}
@@ -155,7 +223,7 @@ const Contact = () => {
               {[
                 { name: "name", placeholder: "Full Name *" },
                 { name: "email", placeholder: "Email *" },
-                { name: "phone", placeholder: "Phone" },
+                { name: "phone", placeholder: "Phone *", type: "tel" },
                 { name: "project", placeholder: "Project Type *" },
                 { name: "location", placeholder: "Location" },
                 { name: "area", placeholder: "Area (SQM)" },
@@ -165,7 +233,7 @@ const Contact = () => {
                     name={field.name}
                     value={form[field.name]}
                     onChange={handleChange}
-                    type="text"
+                    type={field.type || "text"}
                     placeholder={field.placeholder}
                     className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition-colors"
                     disabled={isSubmitting}
@@ -182,11 +250,48 @@ const Contact = () => {
                 name="requirements"
                 value={form.requirements}
                 onChange={handleChange}
-                placeholder="Special Requirements"
+                placeholder="Any Notice"
                 rows="4"
                 className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition-colors resize-none"
                 disabled={isSubmitting}
               ></textarea>
+
+              <div>
+                <label
+                  htmlFor="contact-attachment"
+                  className="flex items-center gap-3 border border-dashed border-gray-600 px-4 py-3 cursor-pointer hover:border-white transition-colors"
+                >
+                  <Paperclip className="w-5 h-5 text-gray-400 shrink-0" />
+                  <span className="text-gray-400 truncate">
+                    {attachment
+                      ? attachment.name
+                      : "Attach a file (pdf, doc, docx, jpg, png — max 3MB)"}
+                  </span>
+                </label>
+                <input
+                  id="contact-attachment"
+                  type="file"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png"
+                  className="hidden"
+                  onChange={handleAttachmentChange}
+                  disabled={isSubmitting}
+                />
+                {attachment && (
+                  <button
+                    type="button"
+                    onClick={clearAttachment}
+                    disabled={isSubmitting}
+                    className="mt-1 text-sm text-gray-400 underline hover:text-white cursor-pointer"
+                  >
+                    Remove attachment
+                  </button>
+                )}
+                {errors.attachment && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.attachment}
+                  </p>
+                )}
+              </div>
 
               {status && (
                 <p
