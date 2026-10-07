@@ -3,6 +3,11 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "devCommand": "node scripts/dev-frontend.mjs",
+  "functions": {
+    "api/contact.js": {
+      "maxDuration": 60
+    }
+  },
   "rewrites": [
     {
       "source": "/((?!api/).*)",

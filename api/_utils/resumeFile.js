@@ -46,6 +46,19 @@ export function detectResumeKind(buffer, filename = "") {
     };
   }
 
+  return detectDocumentKind(buffer, filename);
+}
+
+/**
+ * Identify PDF / DOC / DOCX from magic bytes, without any size limit.
+ * @param {Buffer} buffer
+ * @param {string} [filename]
+ */
+export function detectDocumentKind(buffer, filename = "") {
+  if (!buffer || !Buffer.isBuffer(buffer) || buffer.length < 4) {
+    return { ok: false, error: "The resume file is empty or unreadable." };
+  }
+
   if (startsWith(buffer, EXE_MAGIC)) {
     return { ok: false, error: "Executable files are not allowed." };
   }

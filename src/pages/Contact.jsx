@@ -11,20 +11,24 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
 };
 
-const MAX_ATTACHMENT_BYTES = 3 * 1024 * 1024;
+const MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024;
 const ATTACHMENT_EXT = /\.(pdf|doc|docx|jpe?g|png)$/i;
 
 const OFFICE_MAP_QUERY = "AQAR - Al Khonji Real Estate & Development SAOC";
 const OFFICE_MAP_LINK = "https://maps.app.goo.gl/DEzSRcX1FBEotF7g8";
 
-const readAsDataUrl = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result || ""));
-    reader.onerror = () =>
-      reject(reader.error || new Error("Could not read attachment"));
-    reader.readAsDataURL(file);
+const uploadAttachment = async (file, onProgress) => {
+  const { upload } = await import("@vercel/blob/client");
+  const safeName =
+    file.name.replace(/[^\w.-]+/g, "_").slice(-80) || "attachment";
+  const blob = await upload(`contact-attachments/${safeName}`, file, {
+    access: "private",
+    handleUploadUrl: "/api/contact-upload",
+    contentType: file.type || undefined,
+    onUploadProgress: ({ percentage }) => onProgress(Math.round(percentage)),
   });
+  return { pathname: blob.pathname, filename: file.name };
+};
 
 const Contact = () => {
   const { t } = useSiteSettings();
@@ -42,6 +46,7 @@ const Contact = () => {
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
 
   const validate = () => {
     let newErrors = {};
@@ -81,7 +86,7 @@ const Contact = () => {
       e.target.value = "";
       setErrors({
         ...errors,
-        attachment: "Only .pdf, .doc, .docx, .jpg, .png under 3MB allowed.",
+        attachment: "Only .pdf, .doc, .docx, .jpg, .png under 15MB allowed.",
       });
     }
   };
@@ -107,10 +112,21 @@ const Contact = () => {
       try {
         const payload = { ...form };
         if (attachment) {
-          payload.attachment = {
-            filename: attachment.name,
-            data: await readAsDataUrl(attachment),
-          };
+          setUploadProgress(0);
+          try {
+            payload.attachment = await uploadAttachment(
+              attachment,
+              setUploadProgress,
+            );
+          } catch (uploadError) {
+            setErrors({
+              attachment:
+                "The file could not be uploaded. Please try again or email it to info@smstudios-om.com.",
+            });
+            throw uploadError;
+          } finally {
+            setUploadProgress(null);
+          }
         }
 
         const res = await fetch("/api/contact", {
@@ -265,7 +281,7 @@ const Contact = () => {
                   <span className="text-gray-400 truncate">
                     {attachment
                       ? attachment.name
-                      : "Attach a file (pdf, doc, docx, jpg, png — max 3MB)"}
+                      : "Attach a file (pdf, doc, docx, jpg, png — max 15MB)"}
                   </span>
                 </label>
                 <input
@@ -309,7 +325,11 @@ const Contact = () => {
                   disabled={isSubmitting}
                   className="cursor-pointer bg-white text-black px-8 py-3 font-['El_Messiri'] tracking-[0.12em] hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? "SENDING..." : "SUBMIT"}
+                  {uploadProgress !== null
+                    ? `UPLOADING ${uploadProgress}%`
+                    : isSubmitting
+                      ? "SENDING..."
+                      : "SUBMIT"}
                 </button>
               </div>
             </motion.form>
