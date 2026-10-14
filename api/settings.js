@@ -46,6 +46,10 @@ export default async function handler(req, res) {
     try {
       const settings = await loadSettings();
       res.setHeader("Cache-Control", "no-store");
+      res.setHeader(
+        "Vercel-CDN-Cache-Control",
+        "max-age=30, stale-while-revalidate=300",
+      );
       return res.status(200).json(settings);
     } catch (err) {
       return errorResponse(res, err);

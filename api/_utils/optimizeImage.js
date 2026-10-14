@@ -41,3 +41,38 @@ export async function optimizeImageBuffer(input) {
     ext: ".webp",
   };
 }
+
+/** Widths of the smaller copies served via srcset; must match RESPONSIVE_WIDTHS in OptimizedImage.jsx. */
+export const RESPONSIVE_WIDTHS = [480, 800, 1200, 1600];
+const RESPONSIVE_MAX_EDGE = 2560;
+const RESPONSIVE_QUALITY = 80;
+
+/**
+ * Full-size WebP (max 2560px edge) plus narrower copies for responsive loading.
+ * Never upscales: copies wider than the source are encoded at the source width.
+ *
+ * @param {Buffer} input
+ * @returns {Promise<{ main: Buffer, variants: { width: number, buffer: Buffer }[] }>}
+ */
+export async function optimizeImageVariants(input) {
+  const source = sharp(input, { failOn: "none" }).rotate();
+  const encode = (resize) =>
+    source
+      .clone()
+      .resize({ ...resize, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: RESPONSIVE_QUALITY, effort: 5, smartSubsample: true })
+      .toBuffer();
+
+  const [main, ...variantBuffers] = await Promise.all([
+    encode({ width: RESPONSIVE_MAX_EDGE, height: RESPONSIVE_MAX_EDGE }),
+    ...RESPONSIVE_WIDTHS.map((width) => encode({ width })),
+  ]);
+
+  return {
+    main,
+    variants: RESPONSIVE_WIDTHS.map((width, i) => ({
+      width,
+      buffer: variantBuffers[i],
+    })),
+  };
+}

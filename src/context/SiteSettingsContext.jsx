@@ -7,9 +7,11 @@ import {
   useState,
 } from "react";
 import { CONTENT_DEFAULTS, DEFAULT_SETTINGS } from "../data/siteSettings";
+import { publicApiUrl, readCache, writeCache } from "../utils/cachedFetch";
 
 const SiteSettingsContext = createContext(null);
 const API = "/api/settings";
+const CACHE_KEY = "sm:settings";
 
 function normalize(data) {
   return {
@@ -27,20 +29,28 @@ function normalize(data) {
 }
 
 export function SiteSettingsProvider({ children }) {
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState(() => {
+    const cached = readCache(CACHE_KEY);
+    return cached ? normalize(cached) : DEFAULT_SETTINGS;
+  });
 
   // Bundled defaults render immediately; stored overrides replace them.
   // Refetched whenever the tab is shown so dashboard edits appear.
   useEffect(() => {
     let cancelled = false;
     const load = () =>
-      fetch(API, { cache: "no-store" })
+      fetch(publicApiUrl(API), { cache: "no-store" })
         .then(async (r) => {
           if (!r.ok) throw new Error(`Settings API failed (${r.status})`);
           return r.json();
         })
         .then((data) => {
-          if (!cancelled) setSettings(normalize(data));
+          if (cancelled) return;
+          writeCache(CACHE_KEY, data);
+          const next = normalize(data);
+          setSettings((prev) =>
+            JSON.stringify(prev) === JSON.stringify(next) ? prev : next,
+          );
         })
         .catch((err) => {
           console.warn("[SiteSettingsContext] Using defaults:", err.message);
@@ -76,6 +86,7 @@ export function SiteSettingsProvider({ children }) {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || "Failed to save settings.");
+    writeCache(CACHE_KEY, data.settings);
     setSettings(normalize(data.settings));
     return data;
   }, []);

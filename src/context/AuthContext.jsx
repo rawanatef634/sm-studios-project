@@ -1,20 +1,36 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useLocation } from "react-router-dom";
 
 const AuthContext = createContext(null);
 
+const ADMIN_PATH = /^\/(login|studio|dashboard)/;
+
 export function AuthProvider({ children }) {
+  const { pathname } = useLocation();
+  const isAdminRoute = ADMIN_PATH.test(pathname);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   // True while waiting for the server-side session check to complete.
   const [isChecking, setIsChecking] = useState(true);
+  const checkedRef = useRef(false);
 
-  // Verify the session with the server on mount.
+  // Verify the session with the server the first time an admin page opens;
+  // public pages never need it.
   // Auth state is always derived from the HTTP-only cookie — never localStorage.
   useEffect(() => {
+    if (!isAdminRoute || checkedRef.current) return;
+    checkedRef.current = true;
     fetch("/api/auth/session", { credentials: "include" })
       .then((res) => setIsAuthenticated(res.ok))
       .catch(() => setIsAuthenticated(false))
       .finally(() => setIsChecking(false));
-  }, []);
+  }, [isAdminRoute]);
 
   /**
    * POST credentials to the server.

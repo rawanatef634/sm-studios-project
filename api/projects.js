@@ -25,6 +25,10 @@ export default async function handler(req, res) {
     try {
       const projects = await loadProjects();
       res.setHeader("Cache-Control", "no-store");
+      res.setHeader(
+        "Vercel-CDN-Cache-Control",
+        "max-age=30, stale-while-revalidate=300",
+      );
       return res.status(200).json(projects);
     } catch (err) {
       return storeErrorResponse(res, err);

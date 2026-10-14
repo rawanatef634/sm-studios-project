@@ -8,6 +8,26 @@
       "maxDuration": 60
     }
   },
+  "headers": [
+    {
+      "source": "/assets/:file([^/]+\\.(?:js|css))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/:file([^/]+\\.(?:png|jpe?g|webp|avif|svg|gif))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=2592000"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/((?!api/).*)",

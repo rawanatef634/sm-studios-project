@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 import { put } from "@vercel/blob";
 import { verifySession, readJsonBody } from "./_utils/auth.js";
 import { blobAuth, hasBlobToken } from "./_utils/blobAuth.js";
-import { optimizeImageBuffer } from "./_utils/optimizeImage.js";
+import { optimizeImageVariants } from "./_utils/optimizeImage.js";
 
 // ---------------------------------------------------------------------------
 // Allowed MIME types (input). Output is always optimized WebP.
@@ -25,32 +25,45 @@ const ROOT = process.cwd();
 const LOCAL_UPLOAD_DIR = resolve(ROOT, "public/uploads");
 
 /**
- * @param {Buffer} fileBuffer
- * @param {string} ext
- * @param {string} contentType
- * @returns {Promise<string>}
+ * Stores the full-size image plus its narrower copies side by side
+ * (`r/<id>.webp`, `r/<id>-800.webp`, …) so OptimizedImage can build a srcset.
+ *
+ * @param {{ main: Buffer, variants: { width: number, buffer: Buffer }[] }} images
+ * @returns {Promise<string>} URL of the full-size image
  */
-async function storeImage(fileBuffer, ext, contentType) {
-  const filename = `${randomUUID()}${ext}`;
+async function storeImage(images) {
+  const id = randomUUID();
+  const files = [
+    { name: `${id}.webp`, buffer: images.main },
+    ...images.variants.map((v) => ({
+      name: `${id}-${v.width}.webp`,
+      buffer: v.buffer,
+    })),
+  ];
 
   if (!hasBlobToken()) {
-    mkdirSync(LOCAL_UPLOAD_DIR, { recursive: true });
-    writeFileSync(resolve(LOCAL_UPLOAD_DIR, filename), fileBuffer);
-    console.info(
-      `[upload] No Blob token — saved locally as /uploads/${filename}`,
-    );
-    return `/uploads/${filename}`;
+    const dir = resolve(LOCAL_UPLOAD_DIR, "r");
+    mkdirSync(dir, { recursive: true });
+    for (const file of files) {
+      writeFileSync(resolve(dir, file.name), file.buffer);
+    }
+    console.info(`[upload] No Blob token — saved locally as /uploads/r/${id}.webp`);
+    return `/uploads/r/${id}.webp`;
   }
 
-  const pathname = `sm-studios/images/${filename}`;
   try {
-    const blob = await put(pathname, fileBuffer, {
-      access: "public",
-      contentType,
-      addRandomSuffix: false,
-      ...blobAuth(),
-    });
-    return blob.url;
+    const [mainBlob] = await Promise.all(
+      files.map((file) =>
+        put(`sm-studios/images/r/${file.name}`, file.buffer, {
+          access: "public",
+          contentType: "image/webp",
+          addRandomSuffix: false,
+          cacheControlMaxAge: 31536000,
+          ...blobAuth(),
+        }),
+      ),
+    );
+    return mainBlob.url;
   } catch (err) {
     const message = err?.message || String(err);
     if (/private store/i.test(message) || /public access/i.test(message)) {
@@ -131,16 +144,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const optimized = await optimizeImageBuffer(fileBuffer);
-    const url = await storeImage(
-      optimized.buffer,
-      optimized.ext,
-      optimized.contentType,
-    );
+    const images = await optimizeImageVariants(fileBuffer);
+    const url = await storeImage(images);
     return res.status(200).json({
       url,
       optimized: true,
-      bytes: optimized.buffer.length,
+      bytes: images.main.length,
     });
   } catch (err) {
     console.error("[upload] store/optimize error:", err.message);

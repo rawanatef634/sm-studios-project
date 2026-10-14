@@ -6,16 +6,21 @@ import {
   useState,
 } from "react";
 import { projects as seedProjects } from "../data/projectsDetails";
+import { publicApiUrl, readCache, writeCache } from "../utils/cachedFetch";
 
 const ProjectsContext = createContext(null);
 const API = "/api/projects";
+const CACHE_KEY = "sm:projects";
 
 function normalizeProjects(data) {
   return Array.isArray(data) ? data : null;
 }
 
 export function ProjectsProvider({ children }) {
-  const [projects, setProjects] = useState(seedProjects);
+  const [projects, setProjects] = useState(() => {
+    const cached = normalizeProjects(readCache(CACHE_KEY));
+    return cached && cached.length > 0 ? cached : seedProjects;
+  });
   const loading = false;
 
   // Refresh from the server in the background, and again whenever the tab is
@@ -24,7 +29,7 @@ export function ProjectsProvider({ children }) {
     let cancelled = false;
 
     const load = () =>
-      fetch(API, { cache: "no-store" })
+      fetch(publicApiUrl(API), { cache: "no-store" })
         .then(async (r) => {
           const data = await r.json().catch(() => null);
           if (!r.ok) {
@@ -38,7 +43,10 @@ export function ProjectsProvider({ children }) {
         })
         .then((list) => {
           if (cancelled || list.length === 0) return;
-          setProjects(list);
+          writeCache(CACHE_KEY, list);
+          setProjects((prev) =>
+            JSON.stringify(prev) === JSON.stringify(list) ? prev : list,
+          );
         })
         .catch((err) => {
           console.warn(
