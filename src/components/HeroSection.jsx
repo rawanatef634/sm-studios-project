@@ -3,16 +3,22 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import OptimizedImage from "./OptimizedImage";
 
-const HeroSection = ({ title, breadcrumb, backgroundImage }) => {
+const HeroSection = ({
+  title,
+  breadcrumb,
+  backgroundImage,
+  backgroundImageStyle,
+}) => {
   // Split breadcrumb text into parts (e.g., "Home / Services")
   const parts = breadcrumb ? breadcrumb.split(" / ") : [];
 
   return (
     <section className="relative bg-cover bg-center h-[340px] md:h-[547px] flex items-center">
       {backgroundImage && (
-        <div className="absolute inset-0 -z-0">
+        <div className="absolute inset-0 -z-0 overflow-hidden">
           <OptimizedImage
             src={backgroundImage}
+            style={backgroundImageStyle}
             alt=""
             className="h-full w-full object-cover object-center"
             sizes="100vw"

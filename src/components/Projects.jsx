@@ -4,15 +4,15 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import OptimizedImage from "../components/OptimizedImage";
 import { useProjects } from "../context/ProjectsContext";
+import { projectImage } from "../utils/imageFraming";
 
 const AUTO_MS = 5000;
 const EASE = [0.22, 1, 0.36, 1];
 
 const DURATION = 0.9;
 
-function projectImage(project) {
-  return project.img || project.heroImage || project.mainImage;
-}
+const listingImage = (project) =>
+  projectImage(project, ["img", "heroImage", "mainImage"]);
 
 function wrapIndex(i, n) {
   return ((i % n) + n) % n;
@@ -69,7 +69,7 @@ function ProjectCard({ project, variant }) {
             }}
           >
             <OptimizedImage
-              src={projectImage(project)}
+              {...listingImage(project)}
               alt={project.title}
               className="h-full w-full object-cover"
               sizes={
@@ -252,7 +252,7 @@ function DesktopStage({ projects, index }) {
             >
               <div className="relative h-full w-full overflow-hidden">
                 <OptimizedImage
-                  src={projectImage(project)}
+                  {...listingImage(project)}
                   alt={project.title}
                   className="h-full w-full object-cover"
                   sizes={isCenter ? "49vw" : "24vw"}
@@ -333,7 +333,7 @@ function MobileStage({ projects, index, direction }) {
           <Link to={`/projects/${center.id}`} className="block">
             <div className="aspect-[4/3] w-full overflow-hidden">
               <OptimizedImage
-                src={projectImage(center)}
+                {...listingImage(center)}
                 alt={center.title}
                 className="h-full w-full object-cover"
                 sizes="92vw"

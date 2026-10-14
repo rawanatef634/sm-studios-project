@@ -4,6 +4,7 @@ import ContactSection from "../components/Contact";
 import Footer from "../components/Footer";
 import HeroSection from "../components/HeroSection";
 import OptimizedImage from "../components/OptimizedImage";
+import { projectImage } from "../utils/imageFraming";
 
 /** @typedef {import("../types/project").Project} Project */
 
@@ -37,13 +38,20 @@ const staggerParent = {
  * @param {{ project: Project }} props
  */
 export default function ProjectTemplate({ project }) {
+  const hero = projectImage(project, ["heroImage", "img"]);
+  const main = projectImage(project, ["mainImage", "img"]);
+  const design1 = projectImage(project, ["designImage1"]);
+  const design2 = projectImage(project, ["designImage2"]);
+  const wide = projectImage(project, ["wideImage"]);
+
   return (
     <>
       {/* HERO SECTION */}
       <HeroSection
         title={project.title}
         breadcrumb={project.breadcrumb}
-        backgroundImage={project.heroImage || project.img}
+        backgroundImage={hero.src}
+        backgroundImageStyle={hero.style}
       />
 
       <div className="bg-[#161B1E]">
@@ -61,7 +69,8 @@ export default function ProjectTemplate({ project }) {
             transition={{ duration: 0.4 }}
           >
             <OptimizedImage
-              src={project.mainImage || project.img}
+              src={main.src}
+              style={main.style}
               alt={project.title}
               className="aspect-[4/3] w-full object-cover md:aspect-auto md:h-[650px] xl:h-[750px]"
               sizes="100vw"
@@ -105,7 +114,7 @@ export default function ProjectTemplate({ project }) {
         <section className="w-full py-16">
           <div className="grid w-full grid-cols-1 gap-6 px-6 md:grid-cols-3 md:px-8">
             {/* Left Image */}
-            {project.designImages?.[0] && (
+            {design1.src && (
               <motion.div
                 className="overflow-hidden shadow-lg"
                 initial="hidden"
@@ -114,7 +123,8 @@ export default function ProjectTemplate({ project }) {
                 variants={fadeUp}
               >
                 <OptimizedImage
-                  src={project.designImages[0]}
+                  src={design1.src}
+                  style={design1.style}
                   alt="design-left"
                   className="h-[240px] w-full object-cover md:h-[500px] xl:h-[620px]"
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -142,7 +152,7 @@ export default function ProjectTemplate({ project }) {
             </motion.div>
 
             {/* Right Image */}
-            {project.designImages?.[1] && (
+            {design2.src && (
               <motion.div
                 className="overflow-hidden shadow-lg"
                 initial="hidden"
@@ -151,7 +161,8 @@ export default function ProjectTemplate({ project }) {
                 variants={fadeUp}
               >
                 <OptimizedImage
-                  src={project.designImages[1]}
+                  src={design2.src}
+                  style={design2.style}
                   alt="design-right"
                   className="h-[240px] w-full object-cover md:h-[500px] xl:h-[620px]"
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -162,7 +173,7 @@ export default function ProjectTemplate({ project }) {
         </section>
 
         {/* WIDE IMAGE */}
-        {project.wideImage && (
+        {wide.src && (
           <motion.div
             className="w-full px-6 py-10 md:px-8"
             initial="hidden"
@@ -170,12 +181,15 @@ export default function ProjectTemplate({ project }) {
             viewport={{ once: true }}
             variants={fadeUp}
           >
-            <OptimizedImage
-              src={project.wideImage}
-              alt="project-wide"
-              className="h-[220px] w-full object-cover shadow-2xl md:h-[650px] xl:h-[800px]"
-              sizes="100vw"
-            />
+            <div className="overflow-hidden shadow-2xl">
+              <OptimizedImage
+                src={wide.src}
+                style={wide.style}
+                alt="project-wide"
+                className="h-[220px] w-full object-cover md:h-[650px] xl:h-[800px]"
+                sizes="100vw"
+              />
+            </div>
           </motion.div>
         )}
 

@@ -5,6 +5,7 @@ import SocialLinks from "./SocialLinks";
 import OptimizedImage from "./OptimizedImage";
 import { useProjects } from "../context/ProjectsContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
+import { projectImage } from "../utils/imageFraming";
 
 const HERO_WIDTHS = [800, 1200, 1600, 2400];
 
@@ -18,12 +19,16 @@ export default function HeroSection() {
       .map((id) => projects.find((p) => String(p.id) === String(id)))
       .filter(Boolean);
     return (chosen.length > 0 ? chosen : projects.slice(0, 3))
-      .map((p) => ({
-        id: p.id,
-        title: p.title,
-        image: p.heroImage || p.mainImage || p.img,
-        link: `/projects/${p.id}`,
-      }))
+      .map((p) => {
+        const { src, style } = projectImage(p, ["heroImage", "mainImage", "img"]);
+        return {
+          id: p.id,
+          title: p.title,
+          image: src,
+          imageStyle: style,
+          link: `/projects/${p.id}`,
+        };
+      })
       .filter((s) => s.image);
   }, [projects, settings.heroProjectIds]);
 
@@ -55,6 +60,7 @@ export default function HeroSection() {
         >
           <OptimizedImage
             src={slides[current].image}
+            style={slides[current].imageStyle}
             alt=""
             className="h-full w-full object-cover object-center"
             sizes="100vw"

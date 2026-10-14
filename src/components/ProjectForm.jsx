@@ -1,13 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
 import { useSiteSettings } from "../context/SiteSettingsContext";
+import ImageFramingEditor from "./admin/ImageFramingEditor";
+import { IMAGE_SLOTS, isDefaultFrame } from "../utils/imageFraming";
 
 /** @typedef {import("../types/project").Project} Project */
 
 // ---------------------------------------------------------------------------
 // ImageField — upload a file to /api/upload or paste a URL manually
 // ---------------------------------------------------------------------------
-function ImageField({ label, value, onChange, onUploadStart, onUploadEnd }) {
+function ImageField({
+  slotKey,
+  value,
+  onChange,
+  frame,
+  onFrameChange,
+  onUploadStart,
+  onUploadEnd,
+}) {
+  const slot = IMAGE_SLOTS[slotKey];
+  const label = slot.label;
   const fileRef = useRef(null);
   const [localPreview, setLocalPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -52,6 +64,7 @@ function ImageField({ label, value, onChange, onUploadStart, onUploadEnd }) {
       URL.revokeObjectURL(objUrl);
       setLocalPreview(null);
       onChange(data.url);
+      onFrameChange(undefined);
     } catch (err) {
       URL.revokeObjectURL(objUrl);
       setLocalPreview(null);
@@ -63,25 +76,44 @@ function ImageField({ label, value, onChange, onUploadStart, onUploadEnd }) {
   };
 
   return (
-    <div className="grid gap-2">
-      <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
-        {label}
-      </span>
+    <div className="grid gap-2 border-t border-slate-800 pt-4 first:border-t-0 first:pt-0">
+      <div className="grid gap-0.5">
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+          {label}
+        </span>
+        <span className="text-[11px] text-slate-400">{slot.description}</span>
+        <span className="text-[11px] text-slate-500">
+          Recommended: {slot.recommended.width} × {slot.recommended.height}px (
+          {slot.recommended.width >= slot.recommended.height
+            ? "landscape"
+            : "portrait"}
+          )
+        </span>
+      </div>
 
-      {/* Preview */}
-      {displayed && (
+      {/* Uploading preview */}
+      {uploading && displayed && (
         <div className="relative w-fit">
           <img
             src={displayed}
             alt=""
             className="h-20 max-w-[180px] rounded-md object-cover border border-slate-700"
           />
-          {uploading && (
-            <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/55">
-              <span className="text-xs text-white">Uploading…</span>
-            </div>
-          )}
+          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/55">
+            <span className="text-xs text-white">Uploading…</span>
+          </div>
         </div>
+      )}
+
+      {/* Framing editor */}
+      {value && !uploading && (
+        <ImageFramingEditor
+          key={value}
+          src={value}
+          frame={frame}
+          onChange={onFrameChange}
+          slot={slot}
+        />
       )}
 
       {/* Actions */}
@@ -110,6 +142,7 @@ function ImageField({ label, value, onChange, onUploadStart, onUploadEnd }) {
             type="button"
             onClick={() => {
               onChange("");
+              onFrameChange(undefined);
               setLocalPreview(null);
               setUploadError("");
             }}
@@ -125,8 +158,11 @@ function ImageField({ label, value, onChange, onUploadStart, onUploadEnd }) {
       <input
         placeholder="Or paste image URL"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-400 placeholder:text-slate-600"
+        onChange={(e) => {
+          onChange(e.target.value);
+          onFrameChange(undefined);
+        }}
+        className="max-w-md rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-400 placeholder:text-slate-600"
       />
 
       {uploadError && (
@@ -176,6 +212,21 @@ export default function ProjectForm({
   const [story, setStory] = useState(initialProject?.story ?? "");
   const [wideImage, setWideImage] = useState(initialProject?.wideImage ?? "");
   const [approach, setApproach] = useState(initialProject?.approach ?? "");
+  const [imageFraming, setImageFraming] = useState(
+    initialProject?.imageFraming ?? {},
+  );
+
+  const frameProps = (slotKey) => ({
+    slotKey,
+    frame: imageFraming[slotKey],
+    onFrameChange: (frame) =>
+      setImageFraming((prev) => {
+        const next = { ...prev };
+        if (!frame || isDefaultFrame(frame)) delete next[slotKey];
+        else next[slotKey] = frame;
+        return next;
+      }),
+  });
 
   // Track concurrent image uploads to block form submission while any are running
   const [uploadCount, setUploadCount] = useState(0);
@@ -199,6 +250,7 @@ export default function ProjectForm({
     setStory(initialProject?.story ?? "");
     setWideImage(initialProject?.wideImage ?? "");
     setApproach(initialProject?.approach ?? "");
+    setImageFraming(initialProject?.imageFraming ?? {});
     setUploadCount(0);
     // Only reset when switching projects, not when categories reload.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -238,6 +290,7 @@ export default function ProjectForm({
       story,
       wideImage: wideImage || undefined,
       approach: approach || undefined,
+      imageFraming: Object.keys(imageFraming).length ? imageFraming : undefined,
     };
 
     onSubmit(project);
@@ -356,44 +409,49 @@ export default function ProjectForm({
 
       {/* Image fields */}
       <div className="border-t border-slate-800 pt-4">
-        <p className="mb-4 text-xs uppercase tracking-wider text-slate-500">
+        <p className="mb-1 text-xs uppercase tracking-wider text-slate-500">
           Images — upload a file or paste a URL
         </p>
-        <div className="grid gap-6 md:grid-cols-2">
+        <p className="mb-4 text-[11px] text-slate-500">
+          Listed in the order they appear on the project page. After uploading,
+          choose the focus point and zoom — the previews show exactly how each
+          image will be cropped on desktop, tablet and mobile.
+        </p>
+        <div className="grid gap-6">
           <ImageField
-            label="Hero Image"
             value={heroImage}
             onChange={setHeroImage}
+            {...frameProps("heroImage")}
             {...imageUploadProps}
           />
           <ImageField
-            label="Listing Image (img)"
-            value={img}
-            onChange={setImg}
-            {...imageUploadProps}
-          />
-          <ImageField
-            label="Main Image"
             value={mainImage}
             onChange={setMainImage}
+            {...frameProps("mainImage")}
             {...imageUploadProps}
           />
           <ImageField
-            label="Wide Image"
-            value={wideImage}
-            onChange={setWideImage}
-            {...imageUploadProps}
-          />
-          <ImageField
-            label="Design Image 1"
             value={designImage1}
             onChange={setDesignImage1}
+            {...frameProps("designImage1")}
             {...imageUploadProps}
           />
           <ImageField
-            label="Design Image 2"
             value={designImage2}
             onChange={setDesignImage2}
+            {...frameProps("designImage2")}
+            {...imageUploadProps}
+          />
+          <ImageField
+            value={wideImage}
+            onChange={setWideImage}
+            {...frameProps("wideImage")}
+            {...imageUploadProps}
+          />
+          <ImageField
+            value={img}
+            onChange={setImg}
+            {...frameProps("img")}
             {...imageUploadProps}
           />
         </div>

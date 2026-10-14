@@ -7,6 +7,10 @@ import OptimizedImage from "../components/OptimizedImage";
 import { useState } from "react";
 import { useProjects } from "../context/ProjectsContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
+import { projectImage } from "../utils/imageFraming";
+
+const listingImage = (project) =>
+  projectImage(project, ["img", "heroImage", "mainImage"]);
 
 export default function ProjectsPage() {
   const { projects } = useProjects();
@@ -70,7 +74,7 @@ export default function ProjectsPage() {
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden">
                     <OptimizedImage
-                      src={proj.img || proj.heroImage || proj.mainImage}
+                      {...listingImage(proj)}
                       alt={`${proj.title} preview`}
                       className="h-full w-full object-cover transition duration-500 ease-out group-hover:scale-110"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
